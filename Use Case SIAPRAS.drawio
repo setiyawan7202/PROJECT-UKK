@@ -1,0 +1,323 @@
+<mxfile host="app.diagrams.net" modified="2026-01-14T01:31:00.000Z" agent="Mozilla/5.0" version="21.0.0" etag="usecase-siapras">
+  <diagram name="Use Case Diagram SIAPRAS" id="usecase-siapras-main">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- System Boundary -->
+        <mxCell id="system-boundary" value="Sistem Inventaris Sarana dan Prasarana (SIAPRAS)" style="shape=rect;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;fillColor=none;strokeColor=#666666;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="320" y="40" width="560" height="720" as="geometry" />
+        </mxCell>
+        
+        <!-- Actor: Admin -->
+        <mxCell id="actor-admin" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="200" width="60" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Actor: Petugas (Staff) -->
+        <mxCell id="actor-petugas" value="Petugas" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="500" width="60" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== USE CASES ==================== -->
+        
+        <!-- UC1: Login -->
+        <mxCell id="uc-login" value="Login" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="80" width="140" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- UC2: Logout -->
+        <mxCell id="uc-logout" value="Logout" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="80" width="140" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- UC3: Lihat Dashboard -->
+        <mxCell id="uc-dashboard" value="Lihat Dashboard" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="500" y="150" width="140" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- ========== ADMIN ONLY USE CASES ========== -->
+        
+        <!-- UC4: Kelola User -->
+        <mxCell id="uc-kelola-user" value="Kelola User" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="220" width="140" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- UC4a: Tambah User -->
+        <mxCell id="uc-tambah-user" value="Tambah User" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="560" y="220" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC4b: Edit User -->
+        <mxCell id="uc-edit-user" value="Edit User" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="700" y="220" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC4c: Hapus User -->
+        <mxCell id="uc-hapus-user" value="Hapus User" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="630" y="270" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- ========== SHARED USE CASES ========== -->
+        
+        <!-- UC5: Kelola Kategori -->
+        <mxCell id="uc-kelola-kategori" value="Kelola Kategori" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="340" width="140" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- UC5a: Tambah Kategori -->
+        <mxCell id="uc-tambah-kategori" value="Tambah Kategori" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="560" y="330" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC5b: Edit Kategori -->
+        <mxCell id="uc-edit-kategori" value="Edit Kategori" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="700" y="330" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC5c: Hapus Kategori -->
+        <mxCell id="uc-hapus-kategori" value="Hapus Kategori" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="630" y="380" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC6: Kelola Ruangan -->
+        <mxCell id="uc-kelola-ruangan" value="Kelola Ruangan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="450" width="140" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- UC6a: Tambah Ruangan -->
+        <mxCell id="uc-tambah-ruangan" value="Tambah Ruangan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="560" y="440" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC6b: Edit Ruangan -->
+        <mxCell id="uc-edit-ruangan" value="Edit Ruangan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="700" y="440" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC6c: Hapus Ruangan -->
+        <mxCell id="uc-hapus-ruangan" value="Hapus Ruangan" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="630" y="490" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC7: Kelola Barang -->
+        <mxCell id="uc-kelola-barang" value="Kelola Barang" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="560" width="140" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- UC7a: Tambah Barang -->
+        <mxCell id="uc-tambah-barang" value="Tambah Barang" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="560" y="550" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC7b: Edit Barang -->
+        <mxCell id="uc-edit-barang" value="Edit Barang" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="700" y="550" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC7c: Hapus Barang -->
+        <mxCell id="uc-hapus-barang" value="Hapus Barang" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="630" y="600" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC7d: Cari/Filter Barang -->
+        <mxCell id="uc-cari-barang" value="Cari/Filter Barang" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="560" y="650" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UC7e: Lihat Detail Barang -->
+        <mxCell id="uc-lihat-barang" value="Lihat Detail Barang" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="700" y="650" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== ASSOCIATIONS ==================== -->
+        
+        <!-- Admin to Login -->
+        <mxCell id="assoc-admin-login" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-admin" target="uc-login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin to Logout -->
+        <mxCell id="assoc-admin-logout" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-admin" target="uc-logout">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin to Dashboard -->
+        <mxCell id="assoc-admin-dashboard" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-admin" target="uc-dashboard">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin to Kelola User -->
+        <mxCell id="assoc-admin-kelola-user" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-admin" target="uc-kelola-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin to Kelola Kategori -->
+        <mxCell id="assoc-admin-kelola-kategori" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-admin" target="uc-kelola-kategori">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin to Kelola Ruangan -->
+        <mxCell id="assoc-admin-kelola-ruangan" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-admin" target="uc-kelola-ruangan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin to Kelola Barang -->
+        <mxCell id="assoc-admin-kelola-barang" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-admin" target="uc-kelola-barang">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Petugas to Login -->
+        <mxCell id="assoc-petugas-login" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-petugas" target="uc-login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Petugas to Logout -->
+        <mxCell id="assoc-petugas-logout" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-petugas" target="uc-logout">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Petugas to Dashboard -->
+        <mxCell id="assoc-petugas-dashboard" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-petugas" target="uc-dashboard">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Petugas to Kelola Kategori -->
+        <mxCell id="assoc-petugas-kelola-kategori" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-petugas" target="uc-kelola-kategori">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Petugas to Kelola Ruangan -->
+        <mxCell id="assoc-petugas-kelola-ruangan" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-petugas" target="uc-kelola-ruangan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Petugas to Kelola Barang -->
+        <mxCell id="assoc-petugas-kelola-barang" value="" style="endArrow=none;html=1;strokeWidth=1.5;" edge="1" parent="1" source="actor-petugas" target="uc-kelola-barang">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== INCLUDE RELATIONSHIPS ==================== -->
+        
+        <!-- Kelola User includes Tambah User -->
+        <mxCell id="include-user-tambah" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-user" target="uc-tambah-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola User includes Edit User -->
+        <mxCell id="include-user-edit" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-user" target="uc-edit-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola User includes Hapus User -->
+        <mxCell id="include-user-hapus" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-user" target="uc-hapus-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Kategori includes Tambah Kategori -->
+        <mxCell id="include-kategori-tambah" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-kategori" target="uc-tambah-kategori">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Kategori includes Edit Kategori -->
+        <mxCell id="include-kategori-edit" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-kategori" target="uc-edit-kategori">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Kategori includes Hapus Kategori -->
+        <mxCell id="include-kategori-hapus" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-kategori" target="uc-hapus-kategori">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Ruangan includes Tambah Ruangan -->
+        <mxCell id="include-ruangan-tambah" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-ruangan" target="uc-tambah-ruangan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Ruangan includes Edit Ruangan -->
+        <mxCell id="include-ruangan-edit" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-ruangan" target="uc-edit-ruangan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Ruangan includes Hapus Ruangan -->
+        <mxCell id="include-ruangan-hapus" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-ruangan" target="uc-hapus-ruangan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Barang includes Tambah Barang -->
+        <mxCell id="include-barang-tambah" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-barang" target="uc-tambah-barang">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Barang includes Edit Barang -->
+        <mxCell id="include-barang-edit" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-barang" target="uc-edit-barang">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Barang includes Hapus Barang -->
+        <mxCell id="include-barang-hapus" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-barang" target="uc-hapus-barang">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Barang includes Cari Barang -->
+        <mxCell id="include-barang-cari" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-barang" target="uc-cari-barang">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Kelola Barang includes Lihat Barang -->
+        <mxCell id="include-barang-lihat" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="uc-kelola-barang" target="uc-lihat-barang">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== LEGEND ==================== -->
+        <mxCell id="legend-box" value="LEGENDA" style="shape=rect;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="920" y="80" width="200" height="200" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-admin" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="940" y="110" width="20" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-admin-text" value="= Use Case khusus Admin" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="105" width="140" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-shared" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="940" y="140" width="20" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-shared-text" value="= Use Case Admin &amp; Petugas" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="135" width="140" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-common" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="940" y="170" width="20" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-common-text" value="= Use Case Umum" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="165" width="140" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-include" value="---&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="940" y="195" width="30" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-include-text" value="= &lt;&lt;include&gt;&gt; relationship" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="195" width="140" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-actor-admin" value="" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="940" y="225" width="15" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-actor-admin-text" value="= Admin (Full Access)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="225" width="140" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-actor-petugas" value="" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="940" y="255" width="15" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-actor-petugas-text" value="= Petugas (Staff)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="255" width="140" height="25" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

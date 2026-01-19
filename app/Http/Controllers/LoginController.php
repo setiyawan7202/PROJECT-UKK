@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Auth;
-use App\Models\Guru;
-use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as AuthFacade;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +18,6 @@ class LoginController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'identifier' => 'required|string|min:8|max:18',
             'password' => 'required|string|min:8',
         ]);
 
@@ -34,39 +31,20 @@ class LoginController extends Controller
             return back()->withErrors(['password' => 'Password salah.'])->withInput();
         }
 
+        AuthFacade::login($user);
+        $request->session()->regenerate();
+
+        // Redirect based on role
         if ($user->role === 'admin') {
-            AuthFacade::login($user);
-            $request->session()->regenerate();
             return redirect()->intended('/admin');
         }
 
         if ($user->role === 'petugas') {
-            AuthFacade::login($user);
-            $request->session()->regenerate();
             return redirect()->intended('/staff');
         }
 
-        if ($user->role === 'pengguna') {
-            $identifier = $request->identifier;
-
-            $guru = Guru::where('user_id', $user->id)->where('nip', $identifier)->first();
-            if ($guru) {
-                AuthFacade::login($user);
-                $request->session()->regenerate();
-                return redirect()->intended('/main');
-            }
-
-            $siswa = Siswa::where('user_id', $user->id)->where('nisn', $identifier)->first();
-            if ($siswa) {
-                AuthFacade::login($user);
-                $request->session()->regenerate();
-                return redirect()->intended('/main');
-            }
-
-            return back()->withErrors(['identifier' => 'NISN/NIP tidak cocok dengan akun ini.'])->withInput();
-        }
-
-        return back()->withErrors(['email' => 'Terjadi kesalahan. Silakan coba lagi.'])->withInput();
+        // Default for pengguna role
+        return redirect()->intended('/main');
     }
 
     public function logout(Request $request)

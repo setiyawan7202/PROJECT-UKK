@@ -104,19 +104,6 @@
                     @enderror
                 </div>
 
-                <!-- NISN / NIP -->
-                <div class="mb-5">
-                    <label for="identifier" class="block text-sm font-medium text-gray-700 mb-2">
-                        NISN / NIP
-                    </label>
-                    <input type="text" id="identifier" name="identifier" value="{{ old('identifier') }}"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 input-focus transition"
-                        placeholder="Masukkan NISN atau NIP" minlength="8" maxlength="18" required>
-                    @error('identifier')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
                 <!-- Password -->
                 <div class="mb-6">
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-2">

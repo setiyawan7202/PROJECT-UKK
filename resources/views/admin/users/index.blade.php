@@ -12,8 +12,7 @@
         <a href="{{ route('admin.users.create') }}"
             class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl font-medium text-sm hover:bg-gray-800 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             Tambah User
         </a>
@@ -42,8 +41,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <input type="text" name="search" value="{{ $search ?? '' }}"
-                        placeholder="Cari nama, email, NIP, atau NISN..."
+                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Cari nama atau email..."
                         class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition">
                 </div>
             </div>
@@ -62,27 +60,10 @@
                     class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $filter === 'petugas' ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
                     Petugas
                 </a>
-                <a href="{{ route('admin.users.index', ['filter' => 'guru', 'search' => $search ?? '']) }}"
-                    class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $filter === 'guru' ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-                    Guru
+                <a href="{{ route('admin.users.index', ['filter' => 'pengguna', 'search' => $search ?? '']) }}"
+                    class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $filter === 'pengguna' ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                    Pengguna
                 </a>
-                <a href="{{ route('admin.users.index', ['filter' => 'siswa', 'search' => $search ?? '']) }}"
-                    class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $filter === 'siswa' ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-                    Siswa
-                </a>
-                
-                @if($filter === 'siswa')
-                    <select onchange="window.location.href=this.value" 
-                        class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 border-none focus:ring-0 cursor-pointer hover:bg-gray-200 transition">
-                        <option value="{{ route('admin.users.index', ['filter' => 'siswa', 'search' => $search ?? '']) }}">Semua Kelas</option>
-                        @foreach($kelas as $k)
-                            <option value="{{ route('admin.users.index', ['filter' => 'siswa', 'search' => $search ?? '', 'kelas_id' => $k->id]) }}" 
-                                {{ isset($kelas_id) && $kelas_id == $k->id ? 'selected' : '' }}>
-                                {{ $k->nama_kelas }}
-                            </option>
-                        @endforeach
-                    </select>
-                @endif
                 <button type="submit"
                     class="px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition">
                     Cari
@@ -93,7 +74,7 @@
 
     <div class="bg-white rounded-xl lg:rounded-2xl border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full min-w-[700px]">
+            <table class="w-full min-w-[600px]">
                 <thead class="bg-gray-50 border-b border-gray-100">
                     <tr>
                         <th
@@ -105,9 +86,6 @@
                         <th
                             class="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
                             Role</th>
-                        <th
-                            class="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
-                            NIP/NISN</th>
                         <th
                             class="px-4 lg:px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
                             Aksi</th>
@@ -128,25 +106,11 @@
                             </td>
                             <td class="px-4 lg:px-6 py-4">
                                 <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
-                                                @if($user->role === 'admin') bg-black text-white
-                                                @elseif($user->role === 'petugas') bg-gray-700 text-white
-                                                @else bg-gray-100 text-gray-700
-                                                @endif">
+                                                        @if($user->role === 'admin') bg-black text-white
+                                                        @elseif($user->role === 'petugas') bg-gray-700 text-white
+                                                        @else bg-gray-100 text-gray-700
+                                                        @endif">
                                     {{ ucfirst($user->role) }}
-                                </span>
-                            </td>
-                            <td class="px-4 lg:px-6 py-4">
-                                <span class="text-sm text-gray-600 whitespace-nowrap">
-                                    @if($user->guru)
-                                        {{ $user->guru->nip }}
-                                    @elseif($user->siswa)
-                                        {{ $user->siswa->nisn }}
-                                        <span class="text-xs text-gray-500 block">
-                                            {{ $user->siswa->kelas->nama_kelas ?? '' }}
-                                        </span>
-                                    @else
-                                        -
-                                    @endif
                                 </span>
                             </td>
                             <td class="px-4 lg:px-6 py-4 text-right">
@@ -165,10 +129,8 @@
                                             @method('DELETE')
                                             <button type="submit"
                                                 class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                             </button>
@@ -179,7 +141,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="4" class="px-6 py-12 text-center text-gray-500">
                                 <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

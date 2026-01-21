@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\RuanganController;
 use App\Http\Controllers\Admin\BarangController;
+use App\Http\Controllers\Admin\KelasController;
 
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
@@ -20,5 +21,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('kategori', KategoriController::class);
     Route::resource('ruangan', RuanganController::class);
     Route::resource('barang', BarangController::class);
+    Route::resource('kelas', KelasController::class);
 
 });

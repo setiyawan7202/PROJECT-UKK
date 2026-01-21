@@ -89,6 +89,32 @@
                 </select>
             </div>
 
+            <!-- Status -->
+            <div class="mb-5">
+                <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <select id="status" name="status"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition bg-white"
+                    onchange="toggleKelasField()">
+                    <option value="">Tidak ada</option>
+                    <option value="siswa" {{ old('status') === 'siswa' ? 'selected' : '' }}>Siswa</option>
+                    <option value="guru" {{ old('status') === 'guru' ? 'selected' : '' }}>Guru</option>
+                </select>
+            </div>
+
+            <!-- Kelas (only shown when status = siswa) -->
+            <div class="mb-5" id="kelas-field" style="{{ old('status') === 'siswa' ? '' : 'display: none;' }}">
+                <label for="kelas_id" class="block text-sm font-medium text-gray-700 mb-2">Kelas</label>
+                <select id="kelas_id" name="kelas_id"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition bg-white">
+                    <option value="">Pilih Kelas</option>
+                    @foreach($kelasList as $kelas)
+                        <option value="{{ $kelas->id }}" {{ old('kelas_id') == $kelas->id ? 'selected' : '' }}>
+                            {{ $kelas->nama_kelas }} ({{ $kelas->jurusan }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             <!-- Submit -->
             <div class="flex flex-col sm:flex-row gap-3">
                 <button type="submit"
@@ -119,6 +145,18 @@
                 input.type = 'password';
                 eyeIcon.classList.remove('hidden');
                 eyeOffIcon.classList.add('hidden');
+            }
+        }
+
+        function toggleKelasField() {
+            const status = document.getElementById('status').value;
+            const kelasField = document.getElementById('kelas-field');
+
+            if (status === 'siswa') {
+                kelasField.style.display = 'block';
+            } else {
+                kelasField.style.display = 'none';
+                document.getElementById('kelas_id').value = '';
             }
         }
     </script>

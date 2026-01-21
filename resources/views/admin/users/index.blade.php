@@ -47,9 +47,9 @@
             </div>
 
             <!-- Filters -->
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2 items-center">
                 <a href="{{ route('admin.users.index', ['search' => $search ?? '']) }}"
-                    class="px-4 py-2 rounded-lg text-sm font-medium transition {{ !$filter ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                    class="px-4 py-2 rounded-lg text-sm font-medium transition {{ !$filter && !$statusFilter && !$kelasFilter ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
                     Semua
                 </a>
                 <a href="{{ route('admin.users.index', ['filter' => 'admin', 'search' => $search ?? '']) }}"
@@ -64,6 +64,26 @@
                     class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $filter === 'pengguna' ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
                     Pengguna
                 </a>
+                <span class="border-l border-gray-300 mx-1"></span>
+                <a href="{{ route('admin.users.index', ['status' => 'siswa', 'search' => $search ?? '']) }}"
+                    class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $statusFilter === 'siswa' ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100' }}">
+                    Siswa
+                </a>
+                <a href="{{ route('admin.users.index', ['status' => 'guru', 'search' => $search ?? '']) }}"
+                    class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $statusFilter === 'guru' ? 'bg-green-600 text-white' : 'bg-green-50 text-green-600 hover:bg-green-100' }}">
+                    Guru
+                </a>
+                <span class="border-l border-gray-300 mx-1"></span>
+                <select name="kelas"
+                    onchange="window.location.href='{{ route('admin.users.index') }}?kelas=' + this.value + '&search={{ $search ?? '' }}'"
+                    class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition bg-white">
+                    <option value="">Semua Kelas</option>
+                    @foreach($kelasList as $kelas)
+                        <option value="{{ $kelas->id }}" {{ $kelasFilter == $kelas->id ? 'selected' : '' }}>
+                            {{ $kelas->nama_kelas }}
+                        </option>
+                    @endforeach
+                </select>
                 <button type="submit"
                     class="px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition">
                     Cari
@@ -74,7 +94,7 @@
 
     <div class="bg-white rounded-xl lg:rounded-2xl border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full min-w-[600px]">
+            <table class="w-full min-w-[800px]">
                 <thead class="bg-gray-50 border-b border-gray-100">
                     <tr>
                         <th
@@ -86,6 +106,12 @@
                         <th
                             class="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
                             Role</th>
+                        <th
+                            class="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
+                            Status</th>
+                        <th
+                            class="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
+                            Kelas</th>
                         <th
                             class="px-4 lg:px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
                             Aksi</th>
@@ -106,12 +132,31 @@
                             </td>
                             <td class="px-4 lg:px-6 py-4">
                                 <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
-                                                        @if($user->role === 'admin') bg-black text-white
-                                                        @elseif($user->role === 'petugas') bg-gray-700 text-white
-                                                        @else bg-gray-100 text-gray-700
-                                                        @endif">
+                                                                        @if($user->role === 'admin') bg-black text-white
+                                                                        @elseif($user->role === 'petugas') bg-gray-700 text-white
+                                                                        @else bg-gray-100 text-gray-700
+                                                                        @endif">
                                     {{ ucfirst($user->role) }}
                                 </span>
+                            </td>
+                            <td class="px-4 lg:px-6 py-4">
+                                @if($user->status)
+                                    <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
+                                                                @if($user->status === 'siswa') bg-blue-100 text-blue-700
+                                                                @else bg-green-100 text-green-700
+                                                                @endif">
+                                        {{ ucfirst($user->status) }}
+                                    </span>
+                                @else
+                                    <span class="text-sm text-gray-400">-</span>
+                                @endif
+                            </td>
+                            <td class="px-4 lg:px-6 py-4">
+                                @if($user->kelas)
+                                    <span class="text-sm text-gray-600">{{ $user->kelas->nama_kelas }}</span>
+                                @else
+                                    <span class="text-sm text-gray-400">-</span>
+                                @endif
                             </td>
                             <td class="px-4 lg:px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
@@ -141,7 +186,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                                 <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Auth;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -13,9 +14,11 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $filter = $request->get('filter');
+        $statusFilter = $request->get('status');
+        $kelasFilter = $request->get('kelas');
         $search = $request->get('search');
 
-        $query = Auth::query();
+        $query = Auth::with('kelas');
 
         if ($filter === 'admin') {
             $query->where('role', 'admin');
@@ -23,6 +26,16 @@ class UserController extends Controller
             $query->where('role', 'petugas');
         } elseif ($filter === 'pengguna') {
             $query->where('role', 'pengguna');
+        }
+
+        if ($statusFilter === 'siswa') {
+            $query->where('status', 'siswa');
+        } elseif ($statusFilter === 'guru') {
+            $query->where('status', 'guru');
+        }
+
+        if ($kelasFilter) {
+            $query->where('kelas_id', $kelasFilter);
         }
 
         if ($search) {
@@ -33,13 +46,15 @@ class UserController extends Controller
         }
 
         $users = $query->orderBy('created_at', 'desc')->get();
+        $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
 
-        return view('admin.users.index', compact('users', 'filter', 'search'));
+        return view('admin.users.index', compact('users', 'filter', 'statusFilter', 'kelasFilter', 'search', 'kelasList'));
     }
 
     public function create()
     {
-        return view('admin.users.create');
+        $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
+        return view('admin.users.create', compact('kelasList'));
     }
 
     public function store(Request $request)
@@ -49,6 +64,8 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
             'role' => 'required|in:admin,petugas,pengguna',
             'nama_lengkap' => 'required|string|max:255',
+            'status' => 'nullable|in:siswa,guru',
+            'kelas_id' => 'nullable|exists:kelas,id',
         ]);
 
         try {
@@ -57,6 +74,8 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
                 'role' => $request->role,
                 'nama_lengkap' => $request->nama_lengkap,
+                'status' => $request->status,
+                'kelas_id' => $request->status === 'siswa' ? $request->kelas_id : null,
             ]);
 
             return redirect()->route('admin.users.index')
@@ -70,8 +89,9 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = Auth::findOrFail($id);
+        $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
 
-        return view('admin.users.edit', compact('user'));
+        return view('admin.users.edit', compact('user', 'kelasList'));
     }
 
     public function update(Request $request, $id)
@@ -83,6 +103,8 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8',
             'role' => 'required|in:admin,petugas,pengguna',
             'nama_lengkap' => 'required|string|max:255',
+            'status' => 'nullable|in:siswa,guru',
+            'kelas_id' => 'nullable|exists:kelas,id',
         ]);
 
         try {
@@ -90,6 +112,8 @@ class UserController extends Controller
                 'email' => $request->email,
                 'nama_lengkap' => $request->nama_lengkap,
                 'role' => $request->role,
+                'status' => $request->status,
+                'kelas_id' => $request->status === 'siswa' ? $request->kelas_id : null,
             ];
 
             if ($request->filled('password')) {

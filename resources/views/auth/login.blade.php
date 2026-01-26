@@ -109,12 +109,14 @@
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
                         Password
                     </label>
-                    <input type="password" id="password" name="password"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 input-focus transition"
-                        placeholder="Masukkan password" minlength="8" required>
-                    @error('password')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <div class="relative">
+                        <input type="password" id="password" name="password"
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 input-focus transition"
+                            placeholder="Masukkan password" minlength="8" required>
+                        @error('password')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <!-- Submit Button -->
@@ -132,6 +134,8 @@
             </a>
         </div>
     </div>
+
+
 
 </body>
 

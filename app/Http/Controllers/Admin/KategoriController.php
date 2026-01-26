@@ -25,7 +25,18 @@ class KategoriController extends Controller
 
     public function create()
     {
-        return view('admin.kategori.create');
+        $generatedKode = Kategori::generateKode();
+        return view('admin.kategori.create', compact('generatedKode'));
+    }
+
+    /**
+     * Generate kode kategori via AJAX
+     */
+    public function generateKode()
+    {
+        return response()->json([
+            'kode' => Kategori::generateKode()
+        ]);
     }
 
     public function store(Request $request)

@@ -15,9 +15,10 @@
 
                 <div>
                     <label for="kode_kategori" class="block text-sm font-medium text-gray-700 mb-2">Kode Kategori <span class="text-red-500">*</span></label>
-                    <input type="text" id="kode_kategori" name="kode_kategori" value="{{ old('kode_kategori') }}"
-                        class="w-full px-4 py-3 border @error('kode_kategori') border-red-500 @else border-gray-200 @enderror rounded-xl focus:outline-none focus:ring-1 focus:ring-black"
-                        placeholder="Masukkan kode kategori">
+                    <input type="text" id="kode_kategori" name="kode_kategori" value="{{ old('kode_kategori', $generatedKode) }}"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-600 focus:outline-none cursor-not-allowed"
+                        readonly>
+                    <p class="text-gray-400 text-xs mt-1">Kode di-generate otomatis</p>
                     @error('kode_kategori')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
@@ -47,3 +48,4 @@
         </div>
     </div>
 @endsection
+

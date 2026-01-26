@@ -8,12 +8,14 @@ class Barang extends Model
 {
     protected $table = 'barang';
     protected $fillable = [
-        'kode_barang',
+        'kode',
         'nama_barang',
         'kategori_id',
         'ruangan_id',
+        'tipe_barang',
+        'jenis_aset',
         'jumlah_stok',
-        'kondisi_saat_ini'
+        'gambar',
     ];
 
     public function kategori()
@@ -24,5 +26,15 @@ class Barang extends Model
     public function ruangan()
     {
         return $this->belongsTo(Ruangan::class);
+    }
+
+    public function units()
+    {
+        return $this->hasMany(BarangUnit::class);
+    }
+
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class);
     }
 }

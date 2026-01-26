@@ -33,9 +33,11 @@
                 <div>
                     <label for="kode_ruangan" class="block text-sm font-medium text-gray-700 mb-2">Kode Ruangan <span
                             class="text-red-500">*</span></label>
-                    <input type="text" id="kode_ruangan" name="kode_ruangan" value="{{ old('kode_ruangan') }}"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-black"
-                        placeholder="Masukkan kode ruangan">
+                    <input type="text" id="kode_ruangan" name="kode_ruangan"
+                        value="{{ old('kode_ruangan', $generatedKode) }}"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-600 focus:outline-none cursor-not-allowed"
+                        readonly>
+                    <p class="text-gray-400 text-xs mt-1">Kode di-generate otomatis</p>
                 </div>
 
                 <div>

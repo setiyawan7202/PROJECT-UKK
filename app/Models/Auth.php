@@ -40,4 +40,9 @@ class Auth extends Authenticatable
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
     }
+
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class, 'user_id');
+    }
 }

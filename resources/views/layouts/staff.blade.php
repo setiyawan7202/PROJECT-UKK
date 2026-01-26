@@ -54,7 +54,7 @@
     </style>
 </head>
 
-<body class="min-h-screen bg-gray-50">
+<body class="min-h-screen bg-gray-50 overflow-hidden h-screen w-screen">
 
     <div id="sidebar-overlay"
         class="sidebar-overlay fixed inset-0 bg-black/50 z-40 opacity-0 pointer-events-none lg:hidden"></div>
@@ -74,7 +74,7 @@
         </div>
     </header>
 
-    <div class="flex">
+    <div class="flex h-full">
         <aside id="sidebar"
             class="sidebar w-64 min-h-screen bg-white border-r border-gray-100 fixed left-0 top-0 z-50 lg:translate-x-0">
             <div class="p-4 lg:p-6 border-b border-gray-100">
@@ -153,7 +153,7 @@
             </div>
         </aside>
 
-        <main class="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8">
+        <main class="flex-1 lg:ml-64 h-full overflow-y-auto p-4 lg:p-8 pt-20 lg:pt-8 bg-gray-50">
             @yield('content')
         </main>
     </div>

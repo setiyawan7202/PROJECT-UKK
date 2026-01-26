@@ -26,7 +26,18 @@ class RuanganController extends Controller
 
     public function create()
     {
-        return view('admin.ruangan.create');
+        $generatedKode = Ruangan::generateKode();
+        return view('admin.ruangan.create', compact('generatedKode'));
+    }
+
+    /**
+     * Generate kode ruangan via AJAX
+     */
+    public function generateKode()
+    {
+        return response()->json([
+            'kode' => Ruangan::generateKode()
+        ]);
     }
 
     public function store(Request $request)

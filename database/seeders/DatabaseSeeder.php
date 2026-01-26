@@ -15,8 +15,8 @@ class DatabaseSeeder extends Seeder
     {
         // Create Admin
         Auth::create([
-            'email' => 'admin@siapras.id',
-            'password' => Hash::make('admin123'),
+            'email' => 'admin@email.com',
+            'password' => Hash::make('password'),
             'nama_lengkap' => 'Administrator',
             'role' => 'admin',
         ]);

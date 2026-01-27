@@ -9,13 +9,23 @@
             <h1 class="text-xl lg:text-2xl font-bold text-gray-900">Kelola User</h1>
             <p class="text-sm text-gray-500">Daftar semua user dalam sistem</p>
         </div>
-        <a href="{{ route('admin.users.create') }}"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl font-medium text-sm hover:bg-gray-800 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Tambah User
-        </a>
+        <div class="flex gap-2">
+            <a href="{{ route('admin.users.trash') }}"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-200 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Sampah
+            </a>
+            <a href="{{ route('admin.users.create') }}"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl font-medium text-sm hover:bg-gray-800 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Tambah User
+            </a>
+        </div>
     </div>
 
     <!-- Alerts -->
@@ -93,10 +103,14 @@
     </div>
 
     <div class="bg-white rounded-xl lg:rounded-2xl border border-gray-100 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full min-w-[800px]">
-                <thead class="bg-gray-50 border-b border-gray-100">
+        <div class="overflow-x-auto w-full">
+            <table class="w-full min-w-[1000px] text-left text-sm whitespace-nowrap">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-500 border-b border-gray-100">
                     <tr>
+                        <th
+                            class="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap w-10">
+                            No</th>
                         <th
                             class="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
                             Nama</th>
@@ -121,9 +135,18 @@
                     @forelse($users as $user)
                         <tr class="hover:bg-gray-50 transition">
                             <td class="px-4 lg:px-6 py-4">
+                                <span class="text-sm text-gray-600 font-medium">{{ $loop->iteration }}</span>
+                            </td>
+                            <td class="px-4 lg:px-6 py-4">
                                 <div>
                                     <p class="font-medium text-gray-900 text-sm whitespace-nowrap">
-                                        {{ $user->nama_lengkap ?? $user->email }}
+                                        @if($user->status == 'siswa' && $user->siswa)
+                                            {{ $user->siswa->username }}
+                                        @elseif($user->status == 'guru' && $user->guru)
+                                            {{ $user->guru->username }}
+                                        @else
+                                            {{ $user->nama_lengkap ?? $user->email }}
+                                        @endif
                                     </p>
                                 </div>
                             </td>
@@ -131,20 +154,22 @@
                                 <span class="text-sm text-gray-600 whitespace-nowrap">{{ $user->email }}</span>
                             </td>
                             <td class="px-4 lg:px-6 py-4">
-                                <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
-                                                                        @if($user->role === 'admin') bg-black text-white
-                                                                        @elseif($user->role === 'petugas') bg-gray-700 text-white
-                                                                        @else bg-gray-100 text-gray-700
-                                                                        @endif">
+                                <span
+                                    class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
+                                                                                                                        @if($user->role === 'admin') bg-black text-white
+                                                                                                                        @elseif($user->role === 'petugas') bg-gray-700 text-white
+                                                                                                                        @else bg-gray-100 text-gray-700
+                                                                                                                        @endif">
                                     {{ ucfirst($user->role) }}
                                 </span>
                             </td>
                             <td class="px-4 lg:px-6 py-4">
                                 @if($user->status)
-                                    <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
-                                                                @if($user->status === 'siswa') bg-blue-100 text-blue-700
-                                                                @else bg-green-100 text-green-700
-                                                                @endif">
+                                    <span
+                                        class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
+                                                                                                                                        @if($user->status === 'siswa') bg-blue-100 text-blue-700
+                                                                                                                                        @else bg-green-100 text-green-700
+                                                                                                                                        @endif">
                                         {{ ucfirst($user->status) }}
                                     </span>
                                 @else
@@ -152,8 +177,8 @@
                                 @endif
                             </td>
                             <td class="px-4 lg:px-6 py-4">
-                                @if($user->kelas)
-                                    <span class="text-sm text-gray-600">{{ $user->kelas->nama_kelas }}</span>
+                                @if($user->status == 'siswa' && $user->siswa && $user->siswa->kelas)
+                                    <span class="text-sm text-gray-600">{{ $user->siswa->kelas->nama_kelas }}</span>
                                 @else
                                     <span class="text-sm text-gray-400">-</span>
                                 @endif

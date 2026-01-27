@@ -99,4 +99,31 @@ class KelasController extends Controller
         return redirect()->route('admin.kelas.index')
             ->with('success', 'Kelas berhasil dihapus!');
     }
+    public function trash()
+    {
+        $kelasList = Kelas::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+        return view('admin.kelas.trash', compact('kelasList'));
+    }
+
+    public function restore($id)
+    {
+        $kelas = Kelas::onlyTrashed()->findOrFail($id);
+        $kelas->restore();
+
+        return redirect()->route('admin.kelas.trash')->with('success', 'Kelas berhasil dipulihkan!');
+    }
+
+    public function forceDelete($id)
+    {
+        $kelas = Kelas::onlyTrashed()->findOrFail($id);
+
+        // Cek jika ada siswa (meskipun soft deleted)
+        if ($kelas->siswa()->withTrashed()->count() > 0) {
+            return back()->withErrors(['error' => 'Tidak dapat menghapus permanen kelas yang masih memiliki siswa (termasuk di sampah)!']);
+        }
+
+        $kelas->forceDelete();
+
+        return redirect()->route('admin.kelas.trash')->with('success', 'Kelas berhasil dihapus permanen!');
+    }
 }

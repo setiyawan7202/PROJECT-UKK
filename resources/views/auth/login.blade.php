@@ -92,15 +92,14 @@
                 @csrf
 
                 <!-- Email -->
-                <div class="mb-5">
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                        Email
-                    </label>
-                    <input type="email" id="email" name="email" value="{{ old('email') }}"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 input-focus transition"
-                        placeholder="Masukkan email" required>
-                    @error('email')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                <div>
+                    <label for="login" class="block text-sm font-medium text-gray-700 mb-2">Email, NISN, atau
+                        NIP</label>
+                    <input type="text" id="login" name="login" value="{{ old('login') }}" required autofocus
+                        class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition"
+                        placeholder="Masukkan Email, NISN, atau NIP">
+                    @error('login')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 

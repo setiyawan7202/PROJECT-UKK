@@ -54,11 +54,12 @@
             </div>
 
             <!-- Nama Lengkap -->
+            <!-- Nama Lengkap (Displayed from relationship, read-only here or updated via relationship? For now, we update users.nama_lengkap... wait, we dropped it!) -->
             <div class="mb-5">
                 <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap <span
                         class="text-red-500">*</span></label>
                 <input type="text" id="nama_lengkap" name="nama_lengkap" required
-                    value="{{ old('nama_lengkap', $user->nama_lengkap) }}"
+                    value="{{ old('nama_lengkap', ($user->siswa ? $user->siswa->username : ($user->guru ? $user->guru->username : ''))) }}"
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
                     placeholder="Nama lengkap">
             </div>
@@ -87,12 +88,30 @@
                 </select>
             </div>
 
+            <!-- NISN (only shown when status = siswa) -->
+            <div class="mb-5" id="nisn-field"
+                style="{{ old('status', $user->status) === 'siswa' ? '' : 'display: none;' }}">
+                <label for="nisn" class="block text-sm font-medium text-gray-700 mb-2">NISN <span
+                        class="text-red-500">*</span></label>
+                <input type="number" id="nisn" name="nisn" value="{{ old('nisn', $user->siswa?->nisn) }}"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
+                    placeholder="Masukkan NISN">
+            </div>
+
+            <!-- NIP (only shown when status = guru) -->
+            <div class="mb-5" id="nip-field" style="{{ old('status', $user->status) === 'guru' ? '' : 'display: none;' }}">
+                <label for="nip" class="block text-sm font-medium text-gray-700 mb-2">NIP <span
+                        class="text-red-500">*</span></label>
+                <input type="number" id="nip" name="nip" value="{{ old('nip', $user->guru?->nip) }}"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
+                    placeholder="Masukkan NIP">
+            </div>
+
             <!-- Kelas (only shown when status = siswa) -->
             <div class="mb-5" id="kelas-field"
                 style="{{ old('status', $user->status) === 'siswa' ? '' : 'display: none;' }}">
                 <label for="kelas_id" class="block text-sm font-medium text-gray-700 mb-2">Kelas</label>
-                <select id="kelas_id" name="kelas_id"
-                    class="searchable-select w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition bg-white">
+                <select id="kelas_id" name="kelas_id" class="searchable-select w-full">
                     <option value="">Pilih Kelas</option>
                     @foreach($kelasList as $kelas)
                         <option value="{{ $kelas->id }}" {{ old('kelas_id', $user->kelas_id) == $kelas->id ? 'selected' : '' }}>
@@ -118,33 +137,13 @@
 @endsection
 
 @push('scripts')
-    <script>
-        function togglePasswordVisibility(id) {
-            const input = document.getElementById(id);
-            const eyeIcon = document.getElementById('eye-icon-' + id);
-            const eyeOffIcon = document.getElementById('eye-off-icon-' + id);
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                eyeIcon.classList.add('hidden');
-                eyeOffIcon.classList.remove('hidden');
-            } else {
-                input.type = 'password';
-                eyeIcon.classList.remove('hidden');
-                eyeOffIcon.classList.add('hidden');
-            }
+    <script>     function togglePasswordVisibility(id) {
+            const input = document.getElementById(id); const eyeIcon = document.getElementById('eye-icon-' + id); const eyeOffIcon = document.getElementById('eye-off-icon-' + id);
+            if (input.type === 'password') { input.type = 'text'; eyeIcon.classList.add('hidden'); eyeOffIcon.classList.remove('hidden'); } else { input.type = 'password'; eyeIcon.classList.remove('hidden'); eyeOffIcon.classList.add('hidden'); }
         }
-
         function toggleKelasField() {
-            const status = document.getElementById('status').value;
-            const kelasField = document.getElementById('kelas-field');
-
-            if (status === 'siswa') {
-                kelasField.style.display = 'block';
-            } else {
-                kelasField.style.display = 'none';
-                document.getElementById('kelas_id').value = '';
-            }
+            const status = document.getElementById('status').value; const kelasField = document.getElementById('kelas-field');
+            if (status === 'siswa') { kelasField.style.display = 'block'; document.getElementById('nisn-field').style.display = 'block'; document.getElementById('nip-field').style.display = 'none'; } else if (status === 'guru') { kelasField.style.display = 'none'; document.getElementById('kelas_id').value = ''; document.getElementById('nisn-field').style.display = 'none'; document.getElementById('nip-field').style.display = 'block'; } else { kelasField.style.display = 'none'; document.getElementById('kelas_id').value = ''; document.getElementById('nisn-field').style.display = 'none'; document.getElementById('nip-field').style.display = 'none'; }
         }
     </script>
 @endpush

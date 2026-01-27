@@ -41,7 +41,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="kategori_id" class="block text-sm font-medium text-gray-700 mb-2">Kategori <span class="text-red-500">*</span></label>
-                        <select id="kategori_id" name="kategori_id" class="searchable-select w-full px-4 py-3 border @error('kategori_id') border-red-500 @else border-gray-200 @enderror rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-black">
+                        <select id="kategori_id" name="kategori_id" class="searchable-select w-full">
                             <option value="">Pilih Kategori</option>
                             @foreach($kategoris as $kategori)
                                 <option value="{{ $kategori->id }}" {{ old('kategori_id') == $kategori->id ? 'selected' : '' }}>{{ $kategori->nama_kategori }}</option>
@@ -53,7 +53,7 @@
                     </div>
                     <div>
                         <label for="ruangan_id" class="block text-sm font-medium text-gray-700 mb-2">Ruangan <span class="text-red-500">*</span></label>
-                        <select id="ruangan_id" name="ruangan_id" class="searchable-select w-full px-4 py-3 border @error('ruangan_id') border-red-500 @else border-gray-200 @enderror rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-black">
+                        <select id="ruangan_id" name="ruangan_id" class="searchable-select w-full">
                             <option value="">Pilih Ruangan</option>
                             @foreach($ruangans as $ruangan)
                                 <option value="{{ $ruangan->id }}" {{ old('ruangan_id') == $ruangan->id ? 'selected' : '' }}>{{ $ruangan->nama_ruangan }}</option>
@@ -72,7 +72,7 @@
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="jenis_aset" value="tik" {{ old('jenis_aset') == 'tik' ? 'checked' : '' }}
                                 class="w-4 h-4 text-black border-gray-300 focus:ring-black">
-                            <span class="text-sm text-gray-700">Aset TIK (Teknologi Informasi & Komunikasi)</span>
+                            <span class="text-sm text-gray-700">Aset TIK</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="jenis_aset" value="non_tik" {{ old('jenis_aset', 'non_tik') == 'non_tik' ? 'checked' : '' }}
@@ -133,4 +133,15 @@
             </form>
         </div>
     </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('.searchable-select').select2({
+                placeholder: "Pilih opsi...",
+                allowClear: true,
+                width: '100%' // Ensure it takes full width
+            });
+        });
+    </script>
 @endsection

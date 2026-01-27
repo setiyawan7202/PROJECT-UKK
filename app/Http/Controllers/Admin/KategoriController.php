@@ -83,4 +83,25 @@ class KategoriController extends Controller
         return redirect()->route('admin.kategori.index')
             ->with('success', 'Kategori berhasil dihapus!');
     }
+    public function trash()
+    {
+        $kategoris = Kategori::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+        return view('admin.kategori.trash', compact('kategoris'));
+    }
+
+    public function restore($id)
+    {
+        $kategori = Kategori::onlyTrashed()->findOrFail($id);
+        $kategori->restore();
+
+        return redirect()->route('admin.kategori.trash')->with('success', 'Kategori berhasil dipulihkan!');
+    }
+
+    public function forceDelete($id)
+    {
+        $kategori = Kategori::onlyTrashed()->findOrFail($id);
+        $kategori->forceDelete();
+
+        return redirect()->route('admin.kategori.trash')->with('success', 'Kategori berhasil dihapus permanen!');
+    }
 }

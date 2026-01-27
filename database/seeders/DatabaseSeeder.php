@@ -17,7 +17,6 @@ class DatabaseSeeder extends Seeder
         Auth::create([
             'email' => 'admin@email.com',
             'password' => Hash::make('password'),
-            'nama_lengkap' => 'Administrator',
             'role' => 'admin',
         ]);
 
@@ -25,16 +24,9 @@ class DatabaseSeeder extends Seeder
         Auth::create([
             'email' => 'petugas@siapras.id',
             'password' => Hash::make('petugas123'),
-            'nama_lengkap' => 'Petugas Sarana',
             'role' => 'petugas',
         ]);
 
-        // Create Pengguna
-        Auth::create([
-            'email' => 'pengguna@siapras.id',
-            'password' => Hash::make('pengguna123'),
-            'nama_lengkap' => 'User Pengguna',
-            'role' => 'pengguna',
-        ]);
+
     }
 }

@@ -70,8 +70,8 @@
             </form>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+        <div class="overflow-x-auto w-full">
+            <table class="w-full min-w-[1000px] text-left text-sm whitespace-nowrap">
                 <thead>
                     <tr class="bg-gray-50 text-gray-500 border-b border-gray-100">
                         <th class="px-6 py-3 font-semibold text-xs uppercase">Kode</th>
@@ -188,8 +188,7 @@
     <div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
         onclick="closeImageModal()">
         <div class="relative max-w-4xl max-h-[90vh]" onclick="event.stopPropagation()">
-            <button onclick="closeImageModal()"
-                class="absolute -top-10 right-0 text-white hover:text-gray-300 transition">
+            <button onclick="closeImageModal()" class="absolute -top-10 right-0 text-white hover:text-gray-300 transition">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -213,7 +212,7 @@
         }
 
         // Close modal on ESC key
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeImageModal();
             }

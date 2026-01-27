@@ -39,7 +39,7 @@
                         class="text-red-500">*</span></label>
                 <input type="text" id="nama_kelas" name="nama_kelas" value="{{ old('nama_kelas') }}" required
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
-                    placeholder="Contoh: X RPL 1">
+                    placeholder="Masukan nama kelas">
             </div>
 
             <!-- Jurusan -->
@@ -48,7 +48,7 @@
                         class="text-red-500">*</span></label>
                 <input type="text" id="jurusan" name="jurusan" value="{{ old('jurusan') }}" required
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
-                    placeholder="Contoh: RPL, TKJ, MM">
+                    placeholder="Masukan nama jurusan">
             </div>
 
             <!-- Tingkat -->

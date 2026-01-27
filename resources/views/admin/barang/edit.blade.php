@@ -50,7 +50,7 @@
                         <label for="kategori_id" class="block text-sm font-medium text-gray-700 mb-2">Kategori <span
                                 class="text-red-500">*</span></label>
                         <select id="kategori_id" name="kategori_id"
-                            class="searchable-select w-full px-4 py-3 border @error('kategori_id') border-red-500 @else border-gray-200 @enderror rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-black">
+                            class="searchable-select w-full">
                             <option value="">Pilih Kategori</option>
                             @foreach($kategoris as $kategori)
                                 <option value="{{ $kategori->id }}" {{ old('kategori_id', $barang->kategori_id) == $kategori->id ? 'selected' : '' }}>{{ $kategori->nama_kategori }}</option>
@@ -64,7 +64,7 @@
                         <label for="ruangan_id" class="block text-sm font-medium text-gray-700 mb-2">Ruangan <span
                                 class="text-red-500">*</span></label>
                         <select id="ruangan_id" name="ruangan_id"
-                            class="searchable-select w-full px-4 py-3 border @error('ruangan_id') border-red-500 @else border-gray-200 @enderror rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-black">
+                            class="searchable-select w-full">
                             <option value="">Pilih Ruangan</option>
                             @foreach($ruangans as $ruangan)
                                 <option value="{{ $ruangan->id }}" {{ old('ruangan_id', $barang->ruangan_id) == $ruangan->id ? 'selected' : '' }}>{{ $ruangan->nama_ruangan }}</option>
@@ -144,6 +144,22 @@
                         class="text-gray-600 font-medium hover:text-gray-900">Lihat Detail Unit</a>
                 </div>
             </form>
+
+            <div class="mt-8 pt-6 border-t border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-red-600">Hapus Barang</h3>
+                        <p class="text-sm text-gray-500">Tindakan ini tidak dapat dibatalkan. Semua data unit terkait juga akan terhapus.</p>
+                    </div>
+                    <form action="{{ route('admin.barang.destroy', $barang->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus barang ini? Semua data terkait akan hilang permanen.');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-red-50 text-red-600 px-6 py-2.5 rounded-xl font-medium hover:bg-red-100 transition border border-red-200">
+                            Hapus Barang
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

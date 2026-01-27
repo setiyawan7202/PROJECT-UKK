@@ -5,8 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Auth;
 use App\Models\Kelas;
+use App\Models\Siswa;
+use App\Models\Guru;
+use App\Mail\UserRegistered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -18,7 +24,7 @@ class UserController extends Controller
         $kelasFilter = $request->get('kelas');
         $search = $request->get('search');
 
-        $query = Auth::with('kelas');
+        $query = Auth::with('siswa.kelas');
 
         if ($filter === 'admin') {
             $query->where('role', 'admin');
@@ -35,7 +41,9 @@ class UserController extends Controller
         }
 
         if ($kelasFilter) {
-            $query->where('kelas_id', $kelasFilter);
+            $query->whereHas('siswa', function ($q) use ($kelasFilter) {
+                $q->where('kelas_id', $kelasFilter);
+            });
         }
 
         if ($search) {
@@ -45,7 +53,7 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->orderBy('created_at', 'desc')->get();
+        $users = $query->orderBy('created_at', 'asc')->get();
         $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
 
         return view('admin.users.index', compact('users', 'filter', 'statusFilter', 'kelasFilter', 'search', 'kelasList'));
@@ -65,23 +73,62 @@ class UserController extends Controller
             'role' => 'required|in:admin,petugas,pengguna',
             'nama_lengkap' => 'required|string|max:255',
             'status' => 'nullable|in:siswa,guru',
-            'kelas_id' => 'nullable|exists:kelas,id',
+            // Siswa validation
+            'nisn' => 'nullable|required_if:status,siswa|unique:siswa,nisn|numeric',
+            'kelas_id' => 'nullable|required_if:status,siswa|exists:kelas,id',
+            // Guru validation
+            'nip' => 'nullable|required_if:status,guru|unique:guru,nip|numeric',
         ]);
 
+        DB::beginTransaction();
         try {
-            Auth::create([
+            $username = null;
+            if ($request->status === 'siswa') {
+                $username = $request->nisn;
+            } elseif ($request->status === 'guru') {
+                $username = $request->nip;
+            }
+
+            $user = Auth::create([
                 'email' => $request->email,
+                'data_nip_nisn' => $username,
                 'password' => Hash::make($request->password),
                 'role' => $request->role,
-                'nama_lengkap' => $request->nama_lengkap,
                 'status' => $request->status,
-                'kelas_id' => $request->status === 'siswa' ? $request->kelas_id : null,
             ]);
 
+            // Create related records
+            if ($request->status === 'siswa') {
+                Siswa::create([
+                    'user_id' => $user->id,
+                    'nisn' => $request->nisn,
+                    'username' => $request->nama_lengkap, // Store nama_lengkap as requested
+                    'email' => $request->email,
+                    'kelas_id' => $request->kelas_id,
+                ]);
+            } elseif ($request->status === 'guru') {
+                Guru::create([
+                    'user_id' => $user->id,
+                    'nip' => $request->nip,
+                    'username' => $request->nama_lengkap, // Store nama_lengkap as requested
+                    'email' => $request->email,
+                ]);
+            }
+
+            // Send Email via SMTP
+            try {
+                Mail::to($user->email)->send(new UserRegistered($user, $request->password, $request->nama_lengkap));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('SMTP Error: ' . $e->getMessage());
+            }
+
+            DB::commit();
+
             return redirect()->route('admin.users.index')
-                ->with('success', 'User berhasil ditambahkan!');
+                ->with('success', 'User berhasil ditambahkan dan notifikasi email dikirim!');
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return back()->withErrors(['error' => 'Gagal menambahkan user: ' . $e->getMessage()])->withInput();
         }
     }
@@ -110,11 +157,36 @@ class UserController extends Controller
         try {
             $userData = [
                 'email' => $request->email,
-                'nama_lengkap' => $request->nama_lengkap,
                 'role' => $request->role,
                 'status' => $request->status,
-                'kelas_id' => $request->status === 'siswa' ? $request->kelas_id : null,
             ];
+
+            // Update Username (Nama Lengkap) in Child Tables
+            if ($request->status === 'siswa') {
+                $user->siswa()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'nisn' => $request->nisn,
+                        'username' => $request->nama_lengkap,
+                        'email' => $request->email,
+                        'kelas_id' => $request->kelas_id
+                    ]
+                );
+                // Also update NISN map
+                $userData['data_nip_nisn'] = $request->nisn;
+
+            } elseif ($request->status === 'guru') {
+                $user->guru()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'nip' => $request->nip,
+                        'username' => $request->nama_lengkap,
+                        'email' => $request->email
+                    ]
+                );
+                // Also update NIP map
+                $userData['data_nip_nisn'] = $request->nip;
+            }
 
             if ($request->filled('password')) {
                 $userData['password'] = Hash::make($request->password);
@@ -142,5 +214,38 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil dihapus!');
+    }
+
+    public function trash()
+    {
+        $users = Auth::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+        return view('admin.users.trash', compact('users'));
+    }
+
+    public function restore($id)
+    {
+        $user = Auth::onlyTrashed()->findOrFail($id);
+        $user->restore();
+        // Restore child records if needed
+        if ($user->status === 'siswa' && $user->siswa())
+            $user->siswa()->restore();
+        if ($user->status === 'guru' && $user->guru())
+            $user->guru()->restore();
+
+        return redirect()->route('admin.users.trash')->with('success', 'User berhasil dipulihkan!');
+    }
+
+    public function forceDelete($id)
+    {
+        $user = Auth::onlyTrashed()->findOrFail($id);
+
+        // Force delete child records
+        if ($user->status === 'siswa' && $user->siswa())
+            $user->siswa()->forceDelete();
+        if ($user->status === 'guru' && $user->guru())
+            $user->guru()->forceDelete();
+
+        $user->forceDelete();
+        return redirect()->route('admin.users.trash')->with('success', 'User berhasil dihapus permanen!');
     }
 }

@@ -12,36 +12,57 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <style>
-        * {
-            font-family: 'Inter', sans-serif;
+        /* Select2 Customization to match Tailwind */
+        .select2-container .select2-selection--single {
+            height: 48px !important;
+            border: 1px solid #e5e7eb !important;
+            /* border-gray-200 */
+            border-radius: 0.75rem !important;
+            /* rounded-xl */
+            padding: 0.5rem 0.5rem !important;
+            display: flex !important;
+            align-items: center !important;
         }
 
-        .card-hover {
-            transition: all 0.3s ease;
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 46px !important;
+            right: 10px !important;
         }
 
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: normal !important;
+            padding-left: 10px !important;
+            color: #111827 !important;
+            /* text-gray-900 */
         }
 
-        .sidebar-link {
-            transition: all 0.2s ease;
+        .select2-dropdown {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 0.75rem !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden !important;
         }
 
-        .sidebar-link:hover {
-            background: #f3f4f6;
+        .select2-search__field {
+            border-radius: 0.5rem !important;
+            padding: 0.5rem !important;
         }
 
-        .sidebar-link.active {
-            background: #000;
-            color: #fff;
+        /* Hide Select2 original element to prevent FOUC */
+        select.searchable-select {
+            visibility: hidden;
         }
 
         /* Mobile Sidebar */
@@ -70,7 +91,7 @@
     </style>
 </head>
 
-<body class="min-h-screen bg-gray-50 overflow-hidden h-screen w-screen">
+<body class="min-h-screen bg-gray-50">
 
     <!-- Mobile Overlay -->
     <div id="sidebar-overlay"
@@ -92,7 +113,7 @@
         </div>
     </header>
 
-    <div class="flex h-full">
+    <div class="flex">
         <!-- Sidebar -->
         <aside id="sidebar"
             class="sidebar w-64 min-h-screen bg-white border-r border-gray-100 fixed left-0 top-0 z-50 lg:translate-x-0">
@@ -226,12 +247,23 @@
         </aside>
 
         <!-- Main Content -->
-        <!-- Main Content -->
-        <main class="flex-1 lg:ml-64 h-full overflow-y-auto p-4 lg:p-8 pt-20 lg:pt-8 bg-gray-50">
+        <main class="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8">
             @yield('content')
         </main>
     </div>
 
+    <script>
+        $(document).ready(function () {
+            // Initialize Select2Globally
+            $('.searchable-select').select2({
+                placeholder: "Pilih opsi...",
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Re-init Select2 when creating dynamic content (if any) or handle manually
+        });
+    </script>
     <script>
         // Mobile sidebar toggle
         const sidebar = document.getElementById('sidebar');
@@ -256,19 +288,6 @@
         overlay?.addEventListener('click', closeSidebarFn);
     </script>
     @stack('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.searchable-select').forEach(el => {
-                new TomSelect(el, {
-                    create: false,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 
 </html>

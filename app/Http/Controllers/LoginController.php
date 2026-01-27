@@ -17,14 +17,17 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'login' => 'required|string',
             'password' => 'required|string|min:8',
         ]);
 
-        $user = Auth::where('email', $request->email)->first();
+        $login = $request->login;
+        $user = Auth::where('email', $login)
+            ->orWhere('data_nip_nisn', $login)
+            ->first();
 
         if (!$user) {
-            return back()->withErrors(['email' => 'Email tidak ditemukan.'])->withInput();
+            return back()->withErrors(['login' => 'Email, NISN, atau NIP tidak ditemukan.'])->withInput();
         }
 
         if (!Hash::check($request->password, $user->password)) {

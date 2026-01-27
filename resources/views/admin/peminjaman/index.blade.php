@@ -35,8 +35,8 @@
     </div>
 
     <div class="bg-white border border-gray-100 rounded-xl overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+        <div class="overflow-x-auto w-full">
+            <table class="w-full min-w-[1000px] text-left text-sm whitespace-nowrap">
                 <thead class="bg-gray-50 text-gray-500">
                     <tr>
                         <th class="px-6 py-3 font-semibold">Peminjam</th>

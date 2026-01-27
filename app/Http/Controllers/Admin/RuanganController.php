@@ -86,4 +86,25 @@ class RuanganController extends Controller
         return redirect()->route('admin.ruangan.index')
             ->with('success', 'Ruangan berhasil dihapus!');
     }
+    public function trash()
+    {
+        $ruangans = Ruangan::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+        return view('admin.ruangan.trash', compact('ruangans'));
+    }
+
+    public function restore($id)
+    {
+        $ruangan = Ruangan::onlyTrashed()->findOrFail($id);
+        $ruangan->restore();
+
+        return redirect()->route('admin.ruangan.trash')->with('success', 'Ruangan berhasil dipulihkan!');
+    }
+
+    public function forceDelete($id)
+    {
+        $ruangan = Ruangan::onlyTrashed()->findOrFail($id);
+        $ruangan->forceDelete();
+
+        return redirect()->route('admin.ruangan.trash')->with('success', 'Ruangan berhasil dihapus permanen!');
+    }
 }

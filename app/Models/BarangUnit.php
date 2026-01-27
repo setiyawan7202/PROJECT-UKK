@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BarangUnit extends Model
 {
+    use SoftDeletes;
     protected $table = 'barang_unit';
     protected $fillable = ['barang_id', 'kode_unit', 'kondisi', 'status'];
 

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Kelas extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'kelas';
 
@@ -22,6 +23,6 @@ class Kelas extends Model
      */
     public function siswa()
     {
-        return $this->hasMany(Auth::class, 'kelas_id')->where('status', 'siswa');
+        return $this->hasMany(Siswa::class, 'kelas_id');
     }
 }

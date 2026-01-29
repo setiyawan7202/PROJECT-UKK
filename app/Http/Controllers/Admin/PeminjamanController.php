@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Peminjaman;
 use App\Models\BarangUnit;
+use App\Services\ImageUploadService;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf; // Ensure barryvdh/laravel-dompdf is installed or handle manual print
 
@@ -118,5 +119,83 @@ class PeminjamanController extends Controller
         }
 
         return view('admin.peminjaman.bukti', compact('peminjaman'));
+    }
+
+    /**
+     * Show Return Form
+     */
+    public function returnForm($id)
+    {
+        $peminjaman = Peminjaman::with(['user', 'barang', 'barangUnit'])->findOrFail($id);
+
+        if ($peminjaman->status !== 'active') {
+            return back()->with('error', 'Hanya peminjaman aktif yang bisa dikembalikan.');
+        }
+
+        return view('admin.peminjaman.return', compact('peminjaman'));
+    }
+
+    /**
+     * Store Return logic
+     */
+    public function storeReturn(Request $request, $id)
+    {
+        $request->validate([
+            'tgl_kembali' => 'required|date',
+            'kondisi' => 'required|in:baik,rusak_ringan,rusak_berat,hilang',
+            'denda' => 'nullable|numeric|min:0',
+            'keterangan' => 'nullable|string',
+            'foto' => 'nullable|image|max:2048',
+        ]);
+
+        $peminjaman = Peminjaman::with('barang', 'barangUnit')->findOrFail($id);
+
+        if ($peminjaman->status !== 'active') {
+            return back()->with('error', 'Hanya peminjaman aktif yang bisa dikembalikan.');
+        }
+
+        // 1. Create Pengembalian Record
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $imageService = new ImageUploadService();
+            $fotoPath = $imageService->upload($request->file('foto'), 'pengembalian_' . time());
+        }
+
+        \App\Models\Pengembalian::create([
+            'peminjaman_id' => $peminjaman->id,
+            'tgl_kembali' => $request->tgl_kembali,
+            'kondisi' => $request->kondisi,
+            'denda' => $request->denda,
+            'keterangan' => $request->keterangan,
+            'petugas_id' => \Illuminate\Support\Facades\Auth::id(),
+            'foto' => $fotoPath,
+        ]);
+
+        // 2. Update Peminjaman Status
+        $peminjaman->update([
+            'status' => 'completed',
+            'tgl_kembali_aktual' => $request->tgl_kembali,
+        ]);
+
+        // 3. Update BarangUnit Status & Stock
+        if ($peminjaman->barangUnit) {
+            $unit = $peminjaman->barangUnit;
+            $statusUnit = 'aktif';
+
+            if ($request->kondisi == 'rusak_ringan') {
+                $statusUnit = 'maintenance';
+            } elseif ($request->kondisi == 'rusak_berat' || $request->kondisi == 'hilang') {
+                $statusUnit = 'rusak';
+            }
+
+            $unit->update(['status' => $statusUnit]);
+
+            // Increment generic stock ONLY if good condition
+            if ($request->kondisi == 'baik') {
+                $peminjaman->barang->increment('jumlah_stok');
+            }
+        }
+
+        return redirect()->route('admin.peminjaman.index')->with('success', 'Barang berhasil dikembalikan.');
     }
 }

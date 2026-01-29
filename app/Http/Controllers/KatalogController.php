@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\BarangUnit;
 use App\Models\Kategori;
 use App\Models\Ruangan;
+use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 
 class KatalogController extends Controller
@@ -38,5 +40,20 @@ class KatalogController extends Controller
         $ruangans = Ruangan::all();
 
         return view('main.katalog.index', compact('barangs', 'kategoris', 'ruangans'));
+    }
+
+    /**
+     * Display the specified barang with unit list.
+     */
+    public function show($id)
+    {
+        $barang = Barang::with(['kategori', 'ruangan', 'units'])->findOrFail($id);
+
+        // Get units that are currently borrowed
+        $borrowedUnitIds = Peminjaman::whereIn('status', ['approved', 'active'])
+            ->pluck('barang_unit_id')
+            ->toArray();
+
+        return view('main.katalog.show', compact('barang', 'borrowedUnitIds'));
     }
 }

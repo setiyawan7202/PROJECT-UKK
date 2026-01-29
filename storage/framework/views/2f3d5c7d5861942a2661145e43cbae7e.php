@@ -1,13 +1,13 @@
-@extends('layouts.main')
 
-@section('title', 'Dashboard - SIAPRAS')
 
-@section('content')
+<?php $__env->startSection('title', 'Dashboard - SIAPRAS'); ?>
+
+<?php $__env->startSection('content'); ?>
     <!-- Welcome Banner -->
     <div class="bg-black text-white rounded-xl sm:rounded-2xl p-4 sm:p-8 mb-4 sm:mb-8 fade-in">
         <h1 class="text-lg sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">
             Selamat Datang,
-            {{ Auth::user()->nama_lengkap }}!
+            <?php echo e(Auth::user()->nama_lengkap); ?>!
         </h1>
         <p class="text-gray-300 text-sm sm:text-base">
             Kelola peminjaman sarana dan prasarana sekolah dengan mudah.
@@ -26,7 +26,7 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-lg sm:text-2xl font-bold text-gray-900">{{ $stats['active'] }}</p>
+                    <p class="text-lg sm:text-2xl font-bold text-gray-900"><?php echo e($stats['active']); ?></p>
                     <p class="text-[10px] sm:text-sm text-gray-500">Aktif</p>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-lg sm:text-2xl font-bold text-gray-900">{{ $stats['pending'] }}</p>
+                    <p class="text-lg sm:text-2xl font-bold text-gray-900"><?php echo e($stats['pending']); ?></p>
                     <p class="text-[10px] sm:text-sm text-gray-500">Pending</p>
                 </div>
             </div>
@@ -57,7 +57,7 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-lg sm:text-2xl font-bold text-gray-900">{{ $stats['completed'] }}</p>
+                    <p class="text-lg sm:text-2xl font-bold text-gray-900"><?php echo e($stats['completed']); ?></p>
                     <p class="text-[10px] sm:text-sm text-gray-500">Selesai</p>
                 </div>
             </div>
@@ -68,7 +68,7 @@
     <h2 class="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Menu Cepat</h2>
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-4">
         <!-- Action 1: Katalog Barang -->
-        <a href="{{ route('katalog.index') }}"
+        <a href="<?php echo e(route('katalog.index')); ?>"
             class="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-4 sm:p-6 text-center card-hover fade-in">
             <div
                 class="w-10 h-10 sm:w-14 sm:h-14 bg-black rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-4">
@@ -82,7 +82,7 @@
         </a>
 
         <!-- Action 2: Riwayat -->
-        <a href="{{ route('riwayat.index') }}"
+        <a href="<?php echo e(route('riwayat.index')); ?>"
             class="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-4 sm:p-6 text-center card-hover fade-in">
             <div
                 class="w-10 h-10 sm:w-14 sm:h-14 bg-gray-100 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-4">
@@ -96,7 +96,7 @@
         </a>
 
         <!-- Action 3: Peminjaman Aktif -->
-        <a href="{{ route('peminjaman.index') }}"
+        <a href="<?php echo e(route('peminjaman.index')); ?>"
             class="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-4 sm:p-6 text-center card-hover fade-in">
             <div
                 class="w-10 h-10 sm:w-14 sm:h-14 bg-gray-100 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-4">
@@ -110,7 +110,7 @@
         </a>
 
         <!-- Action 4: Pengaduan -->
-        <a href="{{ route('pengaduan.index') }}"
+        <a href="<?php echo e(route('pengaduan.index')); ?>"
             class="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-4 sm:p-6 text-center card-hover fade-in">
             <div
                 class="w-10 h-10 sm:w-14 sm:h-14 bg-gray-100 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-4">
@@ -124,7 +124,7 @@
         </a>
 
         <!-- Action 5: Profil -->
-        <a href="{{ route('profil.index') }}"
+        <a href="<?php echo e(route('profil.index')); ?>"
             class="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-4 sm:p-6 text-center card-hover fade-in">
             <div
                 class="w-10 h-10 sm:w-14 sm:h-14 bg-gray-100 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-4">
@@ -137,4 +137,5 @@
             <p class="text-[10px] sm:text-sm text-gray-500 hidden sm:block">Pengaturan akun</p>
         </a>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laragon\www\PROJECT-UKK\resources\views/main/index.blade.php ENDPATH**/ ?>

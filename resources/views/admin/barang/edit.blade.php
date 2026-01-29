@@ -124,7 +124,7 @@
                     @if($barang->gambar)
                         <div class="mb-3">
                             <p class="text-xs text-gray-500 mb-2">Gambar saat ini:</p>
-                            <img src="{{ asset('storage/' . $barang->gambar) }}" alt="Gambar barang" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
+                            <img src="{{ Str::startsWith($barang->gambar, 'http') ? $barang->gambar : asset('storage/' . $barang->gambar) }}" alt="Gambar barang" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
                         </div>
                     @endif
                     

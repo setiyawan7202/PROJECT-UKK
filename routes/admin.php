@@ -55,4 +55,20 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::post('/peminjaman/{id}/activate', [App\Http\Controllers\Admin\PeminjamanController::class, 'activate'])->name('peminjaman.activate');
     Route::get('/peminjaman/{id}/bukti', [App\Http\Controllers\Admin\PeminjamanController::class, 'cetakBukti'])->name('peminjaman.bukti');
 
+    // Return Logic
+    Route::get('/peminjaman/{id}/return', [App\Http\Controllers\Admin\PeminjamanController::class, 'returnForm'])->name('peminjaman.return');
+    Route::post('/peminjaman/{id}/return', [App\Http\Controllers\Admin\PeminjamanController::class, 'storeReturn'])->name('peminjaman.storeReturn');
+
+    // Pengaduan Management
+    Route::get('/pengaduan', [App\Http\Controllers\Admin\PengaduanController::class, 'index'])->name('pengaduan.index');
+    Route::get('/pengaduan/{id}', [App\Http\Controllers\Admin\PengaduanController::class, 'show'])->name('pengaduan.show');
+    Route::put('/pengaduan/{id}/status', [App\Http\Controllers\Admin\PengaduanController::class, 'updateStatus'])->name('pengaduan.status');
+    Route::post('/pengaduan/{id}/response', [App\Http\Controllers\Admin\PengaduanController::class, 'storeResponse'])->name('pengaduan.response');
+
+    // Laporan (Reports)
+    Route::get('/laporan', [App\Http\Controllers\Admin\LaporanController::class, 'index'])->name('laporan.index');
+    Route::post('/laporan/peminjaman', [App\Http\Controllers\Admin\LaporanController::class, 'peminjaman'])->name('laporan.peminjaman');
+    Route::post('/laporan/pengaduan', [App\Http\Controllers\Admin\LaporanController::class, 'pengaduan'])->name('laporan.pengaduan');
+    Route::get('/laporan/barang', [App\Http\Controllers\Admin\LaporanController::class, 'barang'])->name('laporan.barang');
+
 });

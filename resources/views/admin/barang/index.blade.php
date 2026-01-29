@@ -92,10 +92,12 @@
                             </td>
                             <td class="px-6 py-4">
                                 @if($barang->gambar)
-                                    <button
-                                        onclick="showImageModal('{{ asset('storage/' . $barang->gambar) }}', '{{ $barang->nama_barang }}')"
+                                    @php
+                                        $imageUrl = Str::startsWith($barang->gambar, 'http') ? $barang->gambar : asset('storage/' . $barang->gambar);
+                                    @endphp
+                                    <button onclick="showImageModal('{{ $imageUrl }}', '{{ $barang->nama_barang }}')"
                                         class="group cursor-pointer">
-                                        <img src="{{ asset('storage/' . $barang->gambar) }}" alt="{{ $barang->nama_barang }}"
+                                        <img src="{{ $imageUrl }}" alt="{{ $barang->nama_barang }}"
                                             class="w-12 h-12 object-cover rounded-lg border border-gray-200 group-hover:border-black transition">
                                     </button>
                                 @else

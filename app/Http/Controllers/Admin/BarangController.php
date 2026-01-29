@@ -7,6 +7,7 @@ use App\Models\Barang;
 use App\Models\BarangUnit;
 use App\Models\Kategori;
 use App\Models\Ruangan;
+use App\Services\ImageUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -63,7 +64,8 @@ class BarangController extends Controller
             // Handle image upload
             $gambarPath = null;
             if ($request->hasFile('gambar')) {
-                $gambarPath = $request->file('gambar')->store('barang', 'public');
+                $imageService = new ImageUploadService();
+                $gambarPath = $imageService->upload($request->file('gambar'), 'barang_' . time());
             }
 
             // Create barang record
@@ -85,6 +87,7 @@ class BarangController extends Controller
             foreach ($kodes as $kode) {
                 BarangUnit::create([
                     'barang_id' => $barang->id,
+                    'kategori_id' => $request->kategori_id,
                     'kode_unit' => $kode,
                     'kondisi' => 'Baik',
                 ]);
@@ -130,11 +133,9 @@ class BarangController extends Controller
 
         // Handle image upload
         if ($request->hasFile('gambar')) {
-            // Delete old image if exists
-            if ($barang->gambar && Storage::disk('public')->exists($barang->gambar)) {
-                Storage::disk('public')->delete($barang->gambar);
-            }
-            $barang->gambar = $request->file('gambar')->store('barang', 'public');
+            // Note: Old images on ImgBB cannot be deleted via API
+            $imageService = new ImageUploadService();
+            $barang->gambar = $imageService->upload($request->file('gambar'), 'barang_' . time());
         }
 
         $barang->update([

@@ -112,6 +112,10 @@
                                         </a>
                                     </div>
                                 @elseif($item->status == 'active')
+                                    <a href="{{ route('admin.peminjaman.return', $item->id) }}"
+                                        class="bg-black text-white px-3 py-1 rounded-lg text-xs hover:bg-gray-800">
+                                        Kembalikan
+                                    </a>
                                     <a href="{{ route('admin.peminjaman.bukti', $item->id) }}" target="_blank"
                                         class="bg-gray-600 text-white px-3 py-1 rounded-lg text-xs hover:bg-gray-700">
                                         Cetak Bukti

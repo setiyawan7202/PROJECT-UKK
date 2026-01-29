@@ -91,7 +91,7 @@
     </style>
 </head>
 
-<body class="min-h-screen bg-gray-50">
+<body class="h-screen bg-gray-50 overflow-hidden">
 
     <!-- Mobile Overlay -->
     <div id="sidebar-overlay"
@@ -113,12 +113,12 @@
         </div>
     </header>
 
-    <div class="flex">
+    <div class="flex h-full">
         <!-- Sidebar -->
         <aside id="sidebar"
-            class="sidebar w-64 min-h-screen bg-white border-r border-gray-100 fixed left-0 top-0 z-50 lg:translate-x-0">
+            class="sidebar w-64 h-screen bg-white border-r border-gray-100 fixed left-0 top-0 z-50 lg:translate-x-0 flex flex-col">
             <!-- Logo -->
-            <div class="p-4 lg:p-6 border-b border-gray-100">
+            <div class="p-4 lg:p-6 border-b border-gray-100 shrink-0">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <img src="{{ Vite::asset('resources/img/logo.png') }}" alt="Logo"
@@ -138,7 +138,7 @@
             </div>
 
             <!-- Menu -->
-            <nav class="p-3 lg:p-4 space-y-1 overflow-y-auto" style="max-height: calc(100vh - 180px);">
+            <nav class="p-3 lg:p-4 space-y-1 overflow-y-auto flex-1">
                 <a href="{{ route('admin.index') }}"
                     class="sidebar-link {{ request()->routeIs('admin.index') ? 'active' : '' }} flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base mb-1">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,6 +197,15 @@
                     Peminjaman
                 </a>
 
+                <a href="{{ route('admin.pengaduan.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.pengaduan.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Pengaduan
+                </a>
+
                 <p class="px-4 mt-4 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Pengguna &
                     Lainnya</p>
 
@@ -209,8 +218,8 @@
                     Kelola User
                 </a>
 
-                <a href="#"
-                    class="sidebar-link flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base text-gray-600">
+                <a href="{{ route('admin.laporan.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.laporan.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -231,7 +240,7 @@
             </nav>
 
             <!-- Logout -->
-            <div class="absolute bottom-0 left-0 right-0 p-3 lg:p-4 border-t border-gray-100 bg-white">
+            <div class="p-3 lg:p-4 border-t border-gray-100 bg-white shrink-0">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit"
@@ -247,7 +256,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8">
+        <main class="flex-1 lg:ml-64 h-full overflow-y-auto p-4 lg:p-8 pt-20 lg:pt-8 bg-gray-50">
             @yield('content')
         </main>
     </div>

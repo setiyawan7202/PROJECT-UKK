@@ -27,6 +27,12 @@ class PeminjamanController extends Controller
         return view('admin.peminjaman.index', compact('peminjaman'));
     }
 
+    public function show($id)
+    {
+        $peminjaman = Peminjaman::with(['user', 'barang', 'barangUnit', 'pengembalian'])->findOrFail($id);
+        return view('admin.peminjaman.show', compact('peminjaman'));
+    }
+
     /**
      * Approve the specified loan request.
      */

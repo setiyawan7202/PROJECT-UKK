@@ -15,33 +15,27 @@
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 
     <style>
-        /* Force scrollable behavior */
+        /* Prevent unwanted scrolling */
         html {
-            overflow-y: scroll !important;
-            overflow-x: hidden !important;
-            height: 100% !important;
+            overflow: hidden;
+            height: 100%;
             scroll-behavior: smooth;
         }
 
         body {
-            overflow-y: visible !important;
-            overflow-x: hidden !important;
-            height: auto !important;
-            min-height: 100vh !important;
-            max-height: none !important;
-            position: relative !important;
+            overflow: hidden;
+            height: 100%;
         }
 
-        /* Ensure no elements block scroll */
+        /* Ensure proper font */
         * {
             font-family: 'Inter', sans-serif;
-            max-height: none !important;
         }
 
-        /* Allow main content to scroll */
-        main {
-            overflow: visible !important;
-            height: auto !important;
+        /* Allow main content wrapper to scroll when needed */
+        .main-content-wrapper {
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         @keyframes fadeIn {
@@ -72,7 +66,7 @@
     <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 
-<body class="min-h-screen bg-gray-50">
+<body class="min-h-screen bg-gray-50 flex flex-col">
 
     <!-- Navbar -->
     <nav class="bg-white border-b border-gray-100 fixed top-0 left-0 right-0 z-50">
@@ -124,27 +118,30 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 pt-20 sm:pt-24">
-        <?php if(session('success')): ?>
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <strong class="font-bold">Berhasil!</strong>
-                <span class="block sm:inline"><?php echo e(session('success')); ?></span>
-            </div>
-        <?php endif; ?>
+    <!-- Main Content Wrapper with flex-1 to push footer down -->
+    <div class="flex-1 flex flex-col pt-14 sm:pt-16 main-content-wrapper">
+        <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+            <?php if(session('success')): ?>
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+                    role="alert">
+                    <strong class="font-bold">Berhasil!</strong>
+                    <span class="block sm:inline"><?php echo e(session('success')); ?></span>
+                </div>
+            <?php endif; ?>
 
-        <?php if(session('error')): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <strong class="font-bold">Error!</strong>
-                <span class="block sm:inline"><?php echo e(session('error')); ?></span>
-            </div>
-        <?php endif; ?>
+            <?php if(session('error')): ?>
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Error!</strong>
+                    <span class="block sm:inline"><?php echo e(session('error')); ?></span>
+                </div>
+            <?php endif; ?>
 
-        <?php echo $__env->yieldContent('content'); ?>
-    </main>
+            <?php echo $__env->yieldContent('content'); ?>
+        </main>
+    </div>
 
     <!-- Footer -->
-    <footer class="border-t border-gray-100 py-4 sm:py-6 mt-4 sm:mt-8">
+    <footer class="border-t border-gray-100 py-4 sm:py-6 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p class="text-xs sm:text-sm text-gray-500">
                 &copy; <?php echo e(date('Y')); ?> SIAPRAS - SMKN 1 Boyolangu

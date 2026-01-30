@@ -58,7 +58,8 @@ class BarangUnit extends Model
         $prefix = self::generatePrefix($namaBarang);
 
         // Cari nomor terakhir dengan prefix ini
-        $lastUnit = self::where('kode_unit', 'like', $prefix . '-%')
+        $lastUnit = self::withTrashed()
+            ->where('kode_unit', 'like', $prefix . '-%')
             ->orderByRaw("CAST(REPLACE(REPLACE(kode_unit, '{$prefix}-', ''), '-', '') AS UNSIGNED) DESC")
             ->first();
 

@@ -118,6 +118,7 @@ class PeminjamanController extends Controller
         }
 
         Peminjaman::create([
+            'kode' => Peminjaman::generateKode(),
             'user_id' => Auth::id(),
             'barang_id' => $request->barang_id,
             'barang_unit_id' => $request->barang_unit_id, // Added barang_unit_id

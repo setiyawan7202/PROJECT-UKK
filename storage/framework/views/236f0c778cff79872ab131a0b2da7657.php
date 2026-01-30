@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
 
 <head>
     <meta charset="utf-8">
@@ -7,14 +7,14 @@
     <meta name="description" content="SIAPRAS - Sistem Informasi Sarana dan Prasarana SMKN 1 Boyolangu">
 
     <title>SIAPRAS - Sarana & Prasarana</title>
-    <link rel="icon" type="image/png" href="{{ Vite::asset('resources/img/logo.png') }}">
+    <link rel="icon" type="image/png" href="<?php echo e(Vite::asset('resources/img/logo.png')); ?>">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 
     <style>
         * {
@@ -345,7 +345,7 @@
                     <div class="logo-container float-animation">
                         <div class="logo-ring"></div>
                         <div class="glow-animation rounded-full p-5 bg-white">
-                            <img src="{{ Vite::asset('resources/img/logo.png') }}" alt="Logo SIAPRAS"
+                            <img src="<?php echo e(Vite::asset('resources/img/logo.png')); ?>" alt="Logo SIAPRAS"
                                 class="w-36 h-36 md:w-44 md:h-44 object-contain">
                         </div>
                     </div>
@@ -434,11 +434,11 @@
         <footer class="flex-shrink-0 border-t border-gray-200/50 py-6 bg-white/60 backdrop-blur-sm relative z-10">
             <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <img src="{{ Vite::asset('resources/img/logo.png') }}" alt="Logo" class="w-8 h-8 object-contain">
+                    <img src="<?php echo e(Vite::asset('resources/img/logo.png')); ?>" alt="Logo" class="w-8 h-8 object-contain">
                     <span class="font-bold text-gray-700">SIAPRAS</span>
                 </div>
                 <p class="text-sm text-gray-500">
-                    &copy; {{ date('Y') }} SMKN 1 Boyolangu Tulungagung
+                    &copy; <?php echo e(date('Y')); ?> SMKN 1 Boyolangu Tulungagung
                 </p>
             </div>
         </footer>
@@ -446,4 +446,4 @@
 
 </body>
 
-</html>
+</html><?php /**PATH D:\laragon\www\PROJECT-UKK\resources\views/welcome.blade.php ENDPATH**/ ?>

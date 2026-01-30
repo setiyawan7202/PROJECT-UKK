@@ -1,36 +1,38 @@
-@extends('layouts.admin')
 
-@section('title', 'Manajemen Peminjaman')
 
-@section('content')
+<?php $__env->startSection('title', 'Manajemen Peminjaman'); ?>
+
+<?php $__env->startSection('content'); ?>
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900">Manajemen Peminjaman</h1>
         <p class="text-sm text-gray-500">Kelola persetujuan dan status peminjaman.</p>
     </div>
 
-    @if(session('success'))
+    <?php if(session('success')): ?>
         <div class="mb-4 p-4 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
+            <?php echo e(session('success')); ?>
 
-    @if(session('error'))
-        <div class="mb-4 p-4 bg-white border border-gray-200 text-red-600 rounded-xl text-sm">
-            {{ session('error') }}
         </div>
-    @endif
+    <?php endif; ?>
+
+    <?php if(session('error')): ?>
+        <div class="mb-4 p-4 bg-white border border-gray-200 text-red-600 rounded-xl text-sm">
+            <?php echo e(session('error')); ?>
+
+        </div>
+    <?php endif; ?>
 
     <!-- Filters -->
     <div class="bg-white p-4 rounded-xl border border-gray-100 mb-6">
-        <form method="GET" action="{{ route('admin.peminjaman.index') }}" class="flex gap-4">
+        <form method="GET" action="<?php echo e(route('admin.peminjaman.index')); ?>" class="flex gap-4">
             <select name="status" class="px-4 py-2 border rounded-lg text-sm focus:ring-black focus:border-black"
                 onchange="this.form.submit()">
                 <option value="">Semua Status</option>
-                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
-                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
-                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                <option value="pending" <?php echo e(request('status') == 'pending' ? 'selected' : ''); ?>>Pending</option>
+                <option value="approved" <?php echo e(request('status') == 'approved' ? 'selected' : ''); ?>>Approved</option>
+                <option value="active" <?php echo e(request('status') == 'active' ? 'selected' : ''); ?>>Active</option>
+                <option value="completed" <?php echo e(request('status') == 'completed' ? 'selected' : ''); ?>>Completed</option>
+                <option value="rejected" <?php echo e(request('status') == 'rejected' ? 'selected' : ''); ?>>Rejected</option>
             </select>
         </form>
     </div>
@@ -50,32 +52,35 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    @forelse($peminjaman as $item)
+                    <?php $__empty_1 = true; $__currentLoopData = $peminjaman; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4">
-                                <span class="font-mono text-xs font-bold text-gray-900">{{ $item->kode ?? '-' }}</span>
+                                <span class="font-mono text-xs font-bold text-gray-900"><?php echo e($item->kode ?? '-'); ?></span>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-medium text-gray-900">{{ $item->user->nama_lengkap }}</div>
+                                <div class="font-medium text-gray-900"><?php echo e($item->user->nama_lengkap); ?></div>
                                 <div class="text-xs text-gray-500">
-                                    {{ $item->user->siswa->kelas->nama_kelas ?? ucfirst($item->user->role) }}
+                                    <?php echo e($item->user->siswa->kelas->nama_kelas ?? ucfirst($item->user->role)); ?>
+
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-medium">{{ $item->barang->nama_barang }}</div>
+                                <div class="font-medium"><?php echo e($item->barang->nama_barang); ?></div>
                                 <div class="text-xs text-gray-500">
-                                    Unit: {{ $item->barangUnit->kode_unit ?? '(Belum dialokasikan)' }}
+                                    Unit: <?php echo e($item->barangUnit->kode_unit ?? '(Belum dialokasikan)'); ?>
+
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <div>{{ $item->tgl_pinjam->format('d/m/Y') }}</div>
-                                <div class="text-xs text-gray-400">s/d {{ $item->tgl_kembali_rencana->format('d/m/Y') }}</div>
+                                <div><?php echo e($item->tgl_pinjam->format('d/m/Y')); ?></div>
+                                <div class="text-xs text-gray-400">s/d <?php echo e($item->tgl_kembali_rencana->format('d/m/Y')); ?></div>
                             </td>
-                            <td class="px-6 py-4 text-gray-500 max-w-xs truncate" title="{{ $item->tujuan_pinjam }}">
-                                {{ Str::limit($item->tujuan_pinjam, 30) }}
+                            <td class="px-6 py-4 text-gray-500 max-w-xs truncate" title="<?php echo e($item->tujuan_pinjam); ?>">
+                                <?php echo e(Str::limit($item->tujuan_pinjam, 30)); ?>
+
                             </td>
                             <td class="px-6 py-4">
-                                @php
+                                <?php
                                     $colors = [
                                         'pending' => 'bg-gray-100 text-gray-600 border border-gray-200',
                                         'approved' => 'bg-black text-white border border-black',
@@ -84,81 +89,83 @@
                                         'rejected' => 'bg-white text-red-600 border border-red-200',
                                         'overdue' => 'bg-red-50 text-red-700 border border-red-200',
                                     ];
-                                @endphp
+                                ?>
                                 <span
-                                    class="px-2 py-1 rounded-md text-xs font-semibold {{ $colors[$item->status] ?? 'bg-gray-100' }}">
-                                    {{ ucfirst($item->status) }}
+                                    class="px-2 py-1 rounded-md text-xs font-semibold <?php echo e($colors[$item->status] ?? 'bg-gray-100'); ?>">
+                                    <?php echo e(ucfirst($item->status)); ?>
+
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                @if($item->status == 'pending')
+                                <?php if($item->status == 'pending'): ?>
                                     <div class="flex justify-end gap-2">
-                                        <a href="{{ route('admin.peminjaman.show', $item->id) }}"
+                                        <a href="<?php echo e(route('admin.peminjaman.show', $item->id)); ?>"
                                             class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50 font-medium">
                                             Detail
                                         </a>
                                         <button
-                                            onclick="openApproveModal('{{ $item->id }}', '{{ $item->barang->nama_barang }}', {{ $item->barang->units->where('status', 'aktif')->pluck('kode_unit', 'id') }})"
+                                            onclick="openApproveModal('<?php echo e($item->id); ?>', '<?php echo e($item->barang->nama_barang); ?>', <?php echo e($item->barang->units->where('status', 'aktif')->pluck('kode_unit', 'id')); ?>)"
                                             class="bg-black text-white px-3 py-1 rounded-lg text-xs hover:bg-gray-800">
                                             Approve
                                         </button>
-                                        <button onclick="openRejectModal('{{ $item->id }}')"
+                                        <button onclick="openRejectModal('<?php echo e($item->id); ?>')"
                                             class="bg-white text-gray-700 border border-gray-300 px-3 py-1 rounded-lg text-xs hover:bg-gray-50">
                                             Reject
                                         </button>
                                     </div>
-                                @elseif($item->status == 'approved')
+                                <?php elseif($item->status == 'approved'): ?>
                                     <div class="flex justify-end gap-2">
-                                        <form action="{{ route('admin.peminjaman.activate', $item->id) }}" method="POST"
+                                        <form action="<?php echo e(route('admin.peminjaman.activate', $item->id)); ?>" method="POST"
                                             onsubmit="return confirm('Konfirmasi pengambilan barang?')">
-                                            @csrf
+                                            <?php echo csrf_field(); ?>
                                             <button type="submit"
                                                 class="bg-black text-white px-3 py-1 rounded-lg text-xs hover:bg-gray-800">
                                                 Ambil Barang
                                             </button>
                                         </form>
-                                        <a href="{{ route('admin.peminjaman.show', $item->id) }}"
+                                        <a href="<?php echo e(route('admin.peminjaman.show', $item->id)); ?>"
                                             class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50 font-medium">
                                             Detail
                                         </a>
-                                        <a href="{{ route('admin.peminjaman.bukti', $item->id) }}" target="_blank"
+                                        <a href="<?php echo e(route('admin.peminjaman.bukti', $item->id)); ?>" target="_blank"
                                             class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50">
                                             Cetak Bukti
                                         </a>
                                     </div>
-                                @elseif($item->status == 'active')
-                                    <a href="{{ route('admin.peminjaman.return', $item->id) }}"
+                                <?php elseif($item->status == 'active'): ?>
+                                    <a href="<?php echo e(route('admin.peminjaman.return', $item->id)); ?>"
                                         class="bg-black text-white px-3 py-1 rounded-lg text-xs hover:bg-gray-800">
                                         Kembalikan
                                     </a>
-                                    <a href="{{ route('admin.peminjaman.show', $item->id) }}"
+                                    <a href="<?php echo e(route('admin.peminjaman.show', $item->id)); ?>"
                                         class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50 font-medium">
                                         Detail
                                     </a>
-                                    <a href="{{ route('admin.peminjaman.bukti', $item->id) }}" target="_blank"
+                                    <a href="<?php echo e(route('admin.peminjaman.bukti', $item->id)); ?>" target="_blank"
                                         class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50">
                                         Cetak Bukti
                                     </a>
-                                @else
+                                <?php else: ?>
                                     <div class="flex justify-end gap-2">
-                                        <a href="{{ route('admin.peminjaman.show', $item->id) }}"
+                                        <a href="<?php echo e(route('admin.peminjaman.show', $item->id)); ?>"
                                             class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50 font-medium">
                                             Detail
                                         </a>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </td>
                         </tr>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="6" class="px-6 py-8 text-center text-gray-500">Tidak ada data peminjaman.</td>
                         </tr>
-                    @endforelse
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
         <div class="p-4 border-t border-gray-100">
-            {{ $peminjaman->links() }}
+            <?php echo e($peminjaman->links()); ?>
+
         </div>
     </div>
 
@@ -169,7 +176,7 @@
             <p class="text-sm text-gray-600 mb-4" id="approveItemName"></p>
 
             <form id="approveForm" method="POST" action="">
-                @csrf
+                <?php echo csrf_field(); ?>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-1">Pilih Unit Barang</label>
                     <select name="barang_unit_id" id="unitSelect" class="w-full border rounded-lg p-2" required>
@@ -191,7 +198,7 @@
         <div class="bg-white rounded-xl p-6 w-full max-w-md">
             <h3 class="text-lg font-bold mb-4">Tolak Peminjaman</h3>
             <form id="rejectForm" method="POST" action="">
-                @csrf
+                <?php echo csrf_field(); ?>
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-1">Alasan Penolakan</label>
                     <textarea name="keterangan_penolakan"
@@ -234,4 +241,5 @@
             document.getElementById('rejectModal').classList.add('hidden');
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laragon\www\PROJECT-UKK\resources\views/admin/peminjaman/index.blade.php ENDPATH**/ ?>

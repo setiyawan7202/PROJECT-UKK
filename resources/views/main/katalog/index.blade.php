@@ -181,7 +181,27 @@
                         </h3>
                     </div>
 
-                    <div class="w-full h-px bg-gray-50 my-3"></div>
+                    <!-- Kode Barang & Lokasi -->
+                    <div class="flex flex-col gap-1 mb-3">
+                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                            </svg>
+                            <span>{{ $barang->kode ?? '-' }}</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>{{ $barang->ruangan->nama_ruangan ?? 'Tidak ada lokasi' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full h-px bg-gray-100 my-3"></div>
 
                     <div class="flex items-center justify-between">
                         <div class="flex flex-col">
@@ -191,13 +211,13 @@
                             </span>
                         </div>
                         @if($barang->jumlah_stok > 0)
-                            <div
-                                class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-black group-hover:text-white transition">
+                            <a href="{{ route('katalog.show', $barang->id) }}"
+                                class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-black group-hover:text-white transition hover:scale-110">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                 </svg>
-                            </div>
+                            </a>
                         @endif
                     </div>
                 </div>
@@ -224,7 +244,6 @@
 
     <div class="mt-8 flex justify-center">
         {{ $barangs->withQueryString()->links() }}
-    </div>
     </div>
 @endsection
 

@@ -17,18 +17,19 @@ class Kategori extends Model
     public static function generateKode(): string
     {
         $prefix = 'KAT';
-        $lastKategori = self::where('kode_kategori', 'like', $prefix . '%')
+        $lastKategori = self::withTrashed()
+            ->where('kode_kategori', 'like', $prefix . '-%')
             ->orderBy('kode_kategori', 'desc')
             ->first();
 
         if ($lastKategori) {
-            $lastNumber = (int) substr($lastKategori->kode_kategori, strlen($prefix));
+            $lastNumber = (int) substr($lastKategori->kode_kategori, strlen($prefix) + 1);
             $newNumber = $lastNumber + 1;
         } else {
             $newNumber = 1;
         }
 
-        return $prefix . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+        return $prefix . '-' . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
     }
 
     public function barangs()

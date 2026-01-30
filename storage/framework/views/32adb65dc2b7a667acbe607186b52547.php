@@ -1,16 +1,16 @@
-@extends('layouts.main')
 
-@section('title', 'Pengaduan Saya - SIAPRAS')
 
-@section('content')
+<?php $__env->startSection('title', 'Pengaduan Saya - SIAPRAS'); ?>
+
+<?php $__env->startSection('content'); ?>
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold text-gray-900">Pengaduan Saya</h1>
-        <a href="{{ route('pengaduan.create') }}" class="px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition">
+        <a href="<?php echo e(route('pengaduan.create')); ?>" class="px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition">
             + Buat Pengaduan
         </a>
     </div>
 
-    @if($pengaduan->isEmpty())
+    <?php if($pengaduan->isEmpty()): ?>
         <div class="bg-white rounded-xl border border-gray-100 p-8 text-center">
             <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,15 +19,14 @@
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-2">Belum ada pengaduan</h3>
             <p class="text-gray-500 mb-6">Jika Anda menemukan kerusakan sarpras, laporkan di sini.</p>
-            <a href="{{ route('pengaduan.create') }}" class="text-black font-medium hover:underline">Buat Pengaduan Baru &rarr;</a>
+            <a href="<?php echo e(route('pengaduan.create')); ?>" class="text-black font-medium hover:underline">Buat Pengaduan Baru &rarr;</a>
         </div>
-    @else
+    <?php else: ?>
         <div class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                     <thead class="bg-gray-50 border-b border-gray-100">
                         <tr>
-                            <th class="px-6 py-4 font-medium text-gray-500">Kode</th>
                             <th class="px-6 py-4 font-medium text-gray-500">Judul</th>
                             <th class="px-6 py-4 font-medium text-gray-500">Lokasi</th>
                             <th class="px-6 py-4 font-medium text-gray-500">Tanggal</th>
@@ -36,41 +35,42 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        @foreach($pengaduan as $item)
+                        <?php $__currentLoopData = $pengaduan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr class="hover:bg-gray-50 transition">
-                                <td class="px-6 py-4 font-mono text-xs text-blue-600 font-medium">
-                                    {{ $item->kode ?? '-' }}
-                                </td>
-                                <td class="px-6 py-4 font-medium text-gray-900">{{ $item->judul }}</td>
+                                <td class="px-6 py-4 font-medium text-gray-900"><?php echo e($item->judul); ?></td>
                                 <td class="px-6 py-4 text-gray-600">
-                                    {{ $item->ruangan->nama_ruangan ?? $item->lokasi ?? '-' }}
+                                    <?php echo e($item->ruangan->nama_ruangan ?? $item->lokasi ?? '-'); ?>
+
                                 </td>
-                                <td class="px-6 py-4 text-gray-600">{{ $item->created_at->format('d M Y') }}</td>
+                                <td class="px-6 py-4 text-gray-600"><?php echo e($item->created_at->format('d M Y')); ?></td>
                                 <td class="px-6 py-4">
-                                    @if($item->status == 'pending')
+                                    <?php if($item->status == 'pending'): ?>
                                         <span class="px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium">Menunggu</span>
-                                    @elseif($item->status == 'processed')
+                                    <?php elseif($item->status == 'processed'): ?>
                                         <span class="px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">Diproses</span>
-                                    @elseif($item->status == 'completed')
+                                    <?php elseif($item->status == 'completed'): ?>
                                         <span class="px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">Selesai</span>
-                                    @else
+                                    <?php else: ?>
                                         <span class="px-2.5 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium">Ditolak</span>
-                                    @endif
+                                    <?php endif; ?>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="{{ route('pengaduan.show', $item->id) }}" class="text-blue-600 hover:text-blue-800 font-medium">Detail</a>
+                                    <a href="<?php echo e(route('pengaduan.show', $item->id)); ?>" class="text-blue-600 hover:text-blue-800 font-medium">Detail</a>
                                 </td>
                             </tr>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>
                 </table>
             </div>
             
-            @if($pengaduan->hasPages())
+            <?php if($pengaduan->hasPages()): ?>
                 <div class="px-6 py-4 border-t border-gray-100">
-                    {{ $pengaduan->links() }}
+                    <?php echo e($pengaduan->links()); ?>
+
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
-    @endif
-@endsection
+    <?php endif; ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laragon\www\PROJECT-UKK\resources\views/pengaduan/index.blade.php ENDPATH**/ ?>

@@ -91,6 +91,7 @@ class PengaduanController extends Controller
         }
 
         Pengaduan::create([
+            'kode' => Pengaduan::generateKode(),
             'user_id' => Auth::id(),
             'judul' => $request->judul,
             'deskripsi' => $request->deskripsi,

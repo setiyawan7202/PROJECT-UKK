@@ -50,6 +50,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     // Peminjaman Management
     Route::get('/peminjaman', [App\Http\Controllers\Admin\PeminjamanController::class, 'index'])->name('peminjaman.index');
+    Route::get('/peminjaman/{id}', [App\Http\Controllers\Admin\PeminjamanController::class, 'show'])->name('peminjaman.show');
     Route::post('/peminjaman/{id}/approve', [App\Http\Controllers\Admin\PeminjamanController::class, 'approve'])->name('peminjaman.approve');
     Route::post('/peminjaman/{id}/reject', [App\Http\Controllers\Admin\PeminjamanController::class, 'reject'])->name('peminjaman.reject');
     Route::post('/peminjaman/{id}/activate', [App\Http\Controllers\Admin\PeminjamanController::class, 'activate'])->name('peminjaman.activate');

@@ -13,6 +13,7 @@ class Pengaduan extends Model
     protected $table = 'pengaduan';
 
     protected $fillable = [
+        'kode',
         'user_id',
         'judul',
         'deskripsi',
@@ -25,6 +26,27 @@ class Pengaduan extends Model
         'status',
         'foto',
     ];
+
+    /**
+     * Generate kode pengaduan otomatis dengan format PGD00001
+     */
+    public static function generateKode(): string
+    {
+        $prefix = 'PGD';
+        $lastRecord = self::withTrashed()
+            ->where('kode', 'like', $prefix . '-%')
+            ->orderBy('kode', 'desc')
+            ->first();
+
+        if ($lastRecord) {
+            $lastNumber = (int) substr($lastRecord->kode, strlen($prefix) + 1);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        return $prefix . '-' . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+    }
 
     /**
      * Get the user that owns the complaint.

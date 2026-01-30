@@ -11,6 +11,7 @@ class Peminjaman extends Model
     protected $table = 'peminjaman';
 
     protected $fillable = [
+        'kode',
         'user_id',
         'barang_id',
         'barang_unit_id',
@@ -22,6 +23,27 @@ class Peminjaman extends Model
         'status',
         'keterangan_penolakan',
     ];
+
+    /**
+     * Generate kode peminjaman otomatis dengan format PMJ00001
+     */
+    public static function generateKode(): string
+    {
+        $prefix = 'PMJ';
+        $lastRecord = self::withTrashed()
+            ->where('kode', 'like', $prefix . '-%')
+            ->orderBy('kode', 'desc')
+            ->first();
+
+        if ($lastRecord) {
+            $lastNumber = (int) substr($lastRecord->kode, strlen($prefix) + 1);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        return $prefix . '-' . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+    }
 
     protected $casts = [
         'tgl_pinjam' => 'date',

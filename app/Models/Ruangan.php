@@ -17,18 +17,19 @@ class Ruangan extends Model
     public static function generateKode(): string
     {
         $prefix = 'RNG';
-        $lastRuangan = self::where('kode_ruangan', 'like', $prefix . '%')
+        $lastRuangan = self::withTrashed()
+            ->where('kode_ruangan', 'like', $prefix . '-%')
             ->orderBy('kode_ruangan', 'desc')
             ->first();
 
         if ($lastRuangan) {
-            $lastNumber = (int) substr($lastRuangan->kode_ruangan, strlen($prefix));
+            $lastNumber = (int) substr($lastRuangan->kode_ruangan, strlen($prefix) + 1);
             $newNumber = $lastNumber + 1;
         } else {
             $newNumber = 1;
         }
 
-        return $prefix . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+        return $prefix . '-' . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
     }
 
     public function barangs()

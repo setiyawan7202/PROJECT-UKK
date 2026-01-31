@@ -78,6 +78,7 @@ class UserController extends Controller
             'kelas_id' => 'nullable|required_if:status,siswa|exists:kelas,id',
             // Guru validation
             'nip' => 'nullable|required_if:status,guru|unique:guru,nip|numeric',
+            'no_hp' => 'nullable|string|max:15',
         ]);
 
         DB::beginTransaction();
@@ -105,6 +106,7 @@ class UserController extends Controller
                     'username' => $request->nama_lengkap, // Store nama_lengkap as requested
                     'email' => $request->email,
                     'kelas_id' => $request->kelas_id,
+                    'no_hp' => $request->no_hp,
                 ]);
             } elseif ($request->status === 'guru') {
                 Guru::create([
@@ -112,6 +114,7 @@ class UserController extends Controller
                     'nip' => $request->nip,
                     'username' => $request->nama_lengkap, // Store nama_lengkap as requested
                     'email' => $request->email,
+                    'no_hp' => $request->no_hp,
                 ]);
             }
 
@@ -151,7 +154,8 @@ class UserController extends Controller
             'role' => 'required|in:admin,petugas,pengguna',
             'nama_lengkap' => 'required|string|max:255',
             'status' => 'nullable|in:siswa,guru',
-            'kelas_id' => 'nullable|exists:kelas,id',
+            'kelas_id' => 'nullable|required_if:status,siswa|exists:kelas,id',
+            'no_hp' => 'nullable|string|max:15',
         ]);
 
         try {
@@ -169,7 +173,8 @@ class UserController extends Controller
                         'nisn' => $request->nisn,
                         'username' => $request->nama_lengkap,
                         'email' => $request->email,
-                        'kelas_id' => $request->kelas_id
+                        'kelas_id' => $request->kelas_id,
+                        'no_hp' => $request->no_hp
                     ]
                 );
                 // Also update NISN map
@@ -181,7 +186,8 @@ class UserController extends Controller
                     [
                         'nip' => $request->nip,
                         'username' => $request->nama_lengkap,
-                        'email' => $request->email
+                        'email' => $request->email,
+                        'no_hp' => $request->no_hp
                     ]
                 );
                 // Also update NIP map

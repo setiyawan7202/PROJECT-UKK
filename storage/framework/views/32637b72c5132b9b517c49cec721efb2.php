@@ -1,12 +1,12 @@
-@extends('layouts.admin')
 
-@section('title', 'Tambah User')
 
-@section('content')
+<?php $__env->startSection('title', 'Tambah User'); ?>
+
+<?php $__env->startSection('content'); ?>
     <div class="max-w-2xl mx-auto">
         <!-- Header -->
         <div class="mb-6">
-            <a href="{{ route('admin.users.index') }}"
+            <a href="<?php echo e(route('admin.users.index')); ?>"
                 class="hidden lg:inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 text-sm mb-4 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -18,26 +18,26 @@
         </div>
 
         <!-- Error Messages -->
-        @if($errors->any())
+        <?php if($errors->any()): ?>
             <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
                 <ul class="list-disc list-inside space-y-1">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <li><?php echo e($error); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
             </div>
-        @endif
+        <?php endif; ?>
 
         <!-- Form -->
-        <form method="POST" action="{{ route('admin.users.store') }}"
+        <form method="POST" action="<?php echo e(route('admin.users.store')); ?>"
             class="bg-white rounded-xl lg:rounded-2xl border border-gray-100 p-6">
-            @csrf
+            <?php echo csrf_field(); ?>
 
             <!-- Email -->
             <div class="mb-5">
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email <span
                         class="text-red-500">*</span></label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                <input type="email" id="email" name="email" value="<?php echo e(old('email')); ?>" required
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
                     placeholder="Masukkan email">
             </div>
@@ -78,7 +78,7 @@
             <div class="mb-5">
                 <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap <span
                         class="text-red-500">*</span></label>
-                <input type="text" id="nama_lengkap" name="nama_lengkap" value="{{ old('nama_lengkap') }}" required
+                <input type="text" id="nama_lengkap" name="nama_lengkap" value="<?php echo e(old('nama_lengkap')); ?>" required
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
                     placeholder="Nama lengkap">
             </div>
@@ -90,9 +90,9 @@
                 <select id="role" name="role" required
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition bg-white">
                     <option value="">Pilih Role</option>
-                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="petugas" {{ old('role') === 'petugas' ? 'selected' : '' }}>Petugas</option>
-                    <option value="pengguna" {{ old('role') === 'pengguna' ? 'selected' : '' }}>Pengguna</option>
+                    <option value="admin" <?php echo e(old('role') === 'admin' ? 'selected' : ''); ?>>Admin</option>
+                    <option value="petugas" <?php echo e(old('role') === 'petugas' ? 'selected' : ''); ?>>Petugas</option>
+                    <option value="pengguna" <?php echo e(old('role') === 'pengguna' ? 'selected' : ''); ?>>Pengguna</option>
                 </select>
             </div>
 
@@ -103,18 +103,18 @@
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition bg-white"
                     onchange="toggleKelasField()">
                     <option value="">Tidak ada</option>
-                    <option value="siswa" {{ old('status') === 'siswa' ? 'selected' : '' }}>Siswa</option>
-                    <option value="guru" {{ old('status') === 'guru' ? 'selected' : '' }}>Guru</option>
+                    <option value="siswa" <?php echo e(old('status') === 'siswa' ? 'selected' : ''); ?>>Siswa</option>
+                    <option value="guru" <?php echo e(old('status') === 'guru' ? 'selected' : ''); ?>>Guru</option>
                 </select>
             </div>
 
             <!-- No HP (Optional) -->
             <div class="mb-5" id="no_hp-field"
-                style="{{ in_array(old('status'), ['siswa', 'guru']) ? '' : 'display: none;' }}">
+                style="<?php echo e(in_array(old('status'), ['siswa', 'guru']) ? '' : 'display: none;'); ?>">
                 <label for="no_hp" class="block text-sm font-medium text-gray-700 mb-2">No. HP <span
                         class="text-gray-400 font-normal">(Opsional)</span></label>
                 <div class="relative">
-                    <input type="text" id="no_hp" name="no_hp" value="{{ old('no_hp') }}"
+                    <input type="text" id="no_hp" name="no_hp" value="<?php echo e(old('no_hp')); ?>"
                         class="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
                         placeholder="Contoh: 08123456789">
                     <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
@@ -125,33 +125,33 @@
             </div>
 
             <!-- NISN (only shown when status = siswa) -->
-            <div class="mb-5" id="nisn-field" style="{{ old('status') === 'siswa' ? '' : 'display: none;' }}">
+            <div class="mb-5" id="nisn-field" style="<?php echo e(old('status') === 'siswa' ? '' : 'display: none;'); ?>">
                 <label for="nisn" class="block text-sm font-medium text-gray-700 mb-2">NISN <span
                         class="text-red-500">*</span></label>
-                <input type="number" id="nisn" name="nisn" value="{{ old('nisn') }}"
+                <input type="number" id="nisn" name="nisn" value="<?php echo e(old('nisn')); ?>"
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
                     placeholder="Masukkan NISN">
             </div>
 
             <!-- NIP (only shown when status = guru) -->
-            <div class="mb-5" id="nip-field" style="{{ old('status') === 'guru' ? '' : 'display: none;' }}">
+            <div class="mb-5" id="nip-field" style="<?php echo e(old('status') === 'guru' ? '' : 'display: none;'); ?>">
                 <label for="nip" class="block text-sm font-medium text-gray-700 mb-2">NIP <span
                         class="text-red-500">*</span></label>
-                <input type="number" id="nip" name="nip" value="{{ old('nip') }}"
+                <input type="number" id="nip" name="nip" value="<?php echo e(old('nip')); ?>"
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
                     placeholder="Masukkan NIP">
             </div>
 
             <!-- Kelas (only shown when status = siswa) -->
-            <div class="mb-5" id="kelas-field" style="{{ old('status') === 'siswa' ? '' : 'display: none;' }}">
+            <div class="mb-5" id="kelas-field" style="<?php echo e(old('status') === 'siswa' ? '' : 'display: none;'); ?>">
                 <label for="kelas_id" class="block text-sm font-medium text-gray-700 mb-2">Kelas</label>
                 <select id="kelas_id" name="kelas_id" class="searchable-select w-full">
                     <option value="">Pilih Kelas</option>
-                    @foreach($kelasList as $kelas)
-                        <option value="{{ $kelas->id }}" {{ old('kelas_id') == $kelas->id ? 'selected' : '' }}>
-                            {{ $kelas->nama_kelas }} ({{ $kelas->jurusan }})
+                    <?php $__currentLoopData = $kelasList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kelas): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($kelas->id); ?>" <?php echo e(old('kelas_id') == $kelas->id ? 'selected' : ''); ?>>
+                            <?php echo e($kelas->nama_kelas); ?> (<?php echo e($kelas->jurusan); ?>)
                         </option>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
 
@@ -161,16 +161,16 @@
                     class="flex-1 py-3 px-6 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition">
                     Simpan User
                 </button>
-                <a href="{{ route('admin.users.index') }}"
+                <a href="<?php echo e(route('admin.users.index')); ?>"
                     class="py-3 px-6 border border-gray-200 text-gray-600 rounded-xl font-medium text-center hover:bg-gray-50 transition">
                     Batal
                 </a>
             </div>
         </form>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
     <script>
         function generatePassword() {
             const length = 12;
@@ -231,4 +231,5 @@
             generatePassword();
         });
     </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laragon\www\PROJECT-UKK\resources\views/admin/users/create.blade.php ENDPATH**/ ?>

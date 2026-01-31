@@ -27,14 +27,23 @@ class ProfilController extends Controller
         $user = AuthFacade::user();
 
         $request->validate([
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'nullable|string|min:8|confirmed',
+            'no_hp' => 'nullable|string|max:15',
         ]);
 
         /** @var \App\Models\Auth $user */
-        $user->update([
-            'password' => Hash::make($request->password),
-        ]);
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
 
-        return back()->with('success', 'Kata sandi berhasil diperbarui.');
+        if ($user->status === 'siswa' && $user->siswa) {
+            $user->siswa()->update(['no_hp' => $request->no_hp]);
+        } elseif ($user->status === 'guru' && $user->guru) {
+            $user->guru()->update(['no_hp' => $request->no_hp]);
+        }
+
+        return back()->with('success', 'Profil berhasil diperbarui.');
     }
 }

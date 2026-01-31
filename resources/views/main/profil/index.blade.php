@@ -47,42 +47,60 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-2">Email</label>
-                        <div class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-700">
-                            {{ $user->email }}
+                    </div>
+
+                    <!-- Kontak Information (Editable) -->
+                    @if(in_array($user->status, ['siswa', 'guru']))
+                        <div class="pt-2 border-b border-gray-100 pb-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-1">Informasi Kontak</h3>
+                            <p class="text-sm text-gray-500 mb-4">Tambahkan nomor HP agar mudah dihubungi.</p>
+
+                            <div>
+                                <label for="no_hp" class="block text-sm font-medium text-gray-700 mb-2">No. HP <span
+                                        class="text-gray-400 font-normal">(Opsional)</span></label>
+                                <div class="relative">
+                                    <input type="text" id="no_hp" name="no_hp"
+                                        value="{{ old('no_hp', $user->siswa ? $user->siswa->no_hp : ($user->guru ? $user->guru->no_hp : '')) }}"
+                                        class="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
+                                        placeholder="Contoh: 08123456789">
+                                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                        +62
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="pt-2">
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">Ganti Kata Sandi</h3>
+                        <p class="text-sm text-gray-500 mb-6">Amankan akun Anda dengan kata sandi yang kuat.</p>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Kata Sandi Baru</label>
+                                <input type="password" name="password" id="password"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
+                                    placeholder="Minimal 8 karakter" minlength="8">
+                                @error('password')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Kata Sandi</label>
+                                <input type="password" name="password_confirmation" id="password_confirmation"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
+                                    placeholder="Ulangi kata sandi baru" minlength="8">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="pt-2">
-                    <h3 class="text-lg font-bold text-gray-900 mb-1">Ganti Kata Sandi</h3>
-                    <p class="text-sm text-gray-500 mb-6">Amankan akun Anda dengan kata sandi yang kuat.</p>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Kata Sandi Baru</label>
-                            <input type="password" name="password" id="password"
-                                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
-                                placeholder="Minimal 8 karakter" minlength="8">
-                            @error('password')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Kata Sandi</label>
-                            <input type="password" name="password_confirmation" id="password_confirmation"
-                                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
-                                placeholder="Ulangi kata sandi baru" minlength="8">
-                        </div>
+                    <div class="pt-4">
+                        <button type="submit"
+                            class="w-full bg-black text-white font-medium py-3 rounded-lg hover:bg-gray-800 transition shadow-lg shadow-gray-200">
+                            Simpan Perubahan
+                        </button>
                     </div>
-                </div>
-
-                <div class="pt-4">
-                    <button type="submit"
-                        class="w-full bg-black text-white font-medium py-3 rounded-lg hover:bg-gray-800 transition shadow-lg shadow-gray-200">
-                        Simpan Perubahan
-                    </button>
-                </div>
             </form>
         </div>
     </div>

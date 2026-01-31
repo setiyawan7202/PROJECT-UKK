@@ -17,6 +17,7 @@ class Siswa extends Model
         'nisn',
         'username',
         'email',
+        'no_hp',
         'kelas_id',
     ];
 

@@ -127,6 +127,9 @@
                             class="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
                             Kelas</th>
                         <th
+                            class="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
+                            No. HP</th>
+                        <th
                             class="px-4 lg:px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase whitespace-nowrap">
                             Aksi</th>
                     </tr>
@@ -156,10 +159,10 @@
                             <td class="px-4 lg:px-6 py-4">
                                 <span
                                     class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
-                                                                                                                        @if($user->role === 'admin') bg-black text-white
-                                                                                                                        @elseif($user->role === 'petugas') bg-gray-700 text-white
-                                                                                                                        @else bg-gray-100 text-gray-700
-                                                                                                                        @endif">
+                                                                                                                                                        @if($user->role === 'admin') bg-black text-white
+                                                                                                                                                        @elseif($user->role === 'petugas') bg-gray-700 text-white
+                                                                                                                                                        @else bg-gray-100 text-gray-700
+                                                                                                                                                        @endif">
                                     {{ ucfirst($user->role) }}
                                 </span>
                             </td>
@@ -167,9 +170,9 @@
                                 @if($user->status)
                                     <span
                                         class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
-                                                                                                                                        @if($user->status === 'siswa') bg-blue-100 text-blue-700
-                                                                                                                                        @else bg-green-100 text-green-700
-                                                                                                                                        @endif">
+                                                                                                                                                                                        @if($user->status === 'siswa') bg-blue-100 text-blue-700
+                                                                                                                                                                                        @else bg-green-100 text-green-700
+                                                                                                                                                                                        @endif">
                                         {{ ucfirst($user->status) }}
                                     </span>
                                 @else
@@ -179,6 +182,15 @@
                             <td class="px-4 lg:px-6 py-4">
                                 @if($user->status == 'siswa' && $user->siswa && $user->siswa->kelas)
                                     <span class="text-sm text-gray-600">{{ $user->siswa->kelas->nama_kelas }}</span>
+                                @else
+                                    <span class="text-sm text-gray-400">-</span>
+                                @endif
+                            </td>
+                            <td class="px-4 lg:px-6 py-4">
+                                @if($user->status == 'siswa' && $user->siswa)
+                                    <span class="text-sm text-gray-600">{{ $user->siswa->no_hp ?? '-' }}</span>
+                                @elseif($user->status == 'guru' && $user->guru)
+                                    <span class="text-sm text-gray-600">{{ $user->guru->no_hp ?? '-' }}</span>
                                 @else
                                     <span class="text-sm text-gray-400">-</span>
                                 @endif
@@ -211,7 +223,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="8" class="px-6 py-12 text-center text-gray-500">
                                 <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

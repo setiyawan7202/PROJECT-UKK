@@ -5,7 +5,7 @@ use App\Http\Controllers\Staff\KategoriController;
 use App\Http\Controllers\Staff\RuanganController;
 use App\Http\Controllers\Staff\BarangController;
 
-Route::middleware('auth')->prefix('staff')->name('staff.')->group(function () {
+Route::middleware(['auth', 'petugas'])->prefix('staff')->name('staff.')->group(function () {
 
     Route::get('/', fn() => view('staff.index'))->name('index');
 

@@ -88,6 +88,23 @@
                 </select>
             </div>
 
+            <!-- No HP (Optional) -->
+            <div class="mb-5" id="no_hp-field"
+                style="{{ in_array(old('status', $user->status), ['siswa', 'guru']) ? '' : 'display: none;' }}">
+                <label for="no_hp" class="block text-sm font-medium text-gray-700 mb-2">No. HP <span
+                        class="text-gray-400 font-normal">(Opsional)</span></label>
+                <div class="relative">
+                    <input type="text" id="no_hp" name="no_hp"
+                        value="{{ old('no_hp', $user->siswa ? $user->siswa->no_hp : ($user->guru ? $user->guru->no_hp : '')) }}"
+                        class="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
+                        placeholder="Contoh: 08123456789">
+                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                        +62
+                    </div>
+                </div>
+                <p class="mt-1 text-xs text-gray-500">Nomor WhatsApp aktif direkomendasikan.</p>
+            </div>
+
             <!-- NISN (only shown when status = siswa) -->
             <div class="mb-5" id="nisn-field"
                 style="{{ old('status', $user->status) === 'siswa' ? '' : 'display: none;' }}">
@@ -143,7 +160,24 @@
         }
         function toggleKelasField() {
             const status = document.getElementById('status').value; const kelasField = document.getElementById('kelas-field');
-            if (status === 'siswa') { kelasField.style.display = 'block'; document.getElementById('nisn-field').style.display = 'block'; document.getElementById('nip-field').style.display = 'none'; } else if (status === 'guru') { kelasField.style.display = 'none'; document.getElementById('kelas_id').value = ''; document.getElementById('nisn-field').style.display = 'none'; document.getElementById('nip-field').style.display = 'block'; } else { kelasField.style.display = 'none'; document.getElementById('kelas_id').value = ''; document.getElementById('nisn-field').style.display = 'none'; document.getElementById('nip-field').style.display = 'none'; }
+            if (status === 'siswa') {
+                kelasField.style.display = 'block';
+                document.getElementById('nisn-field').style.display = 'block';
+                document.getElementById('nip-field').style.display = 'none';
+                document.getElementById('no_hp-field').style.display = 'block';
+            } else if (status === 'guru') {
+                kelasField.style.display = 'none';
+                document.getElementById('kelas_id').value = '';
+                document.getElementById('nisn-field').style.display = 'none';
+                document.getElementById('nip-field').style.display = 'block';
+                document.getElementById('no_hp-field').style.display = 'block';
+            } else {
+                kelasField.style.display = 'none';
+                document.getElementById('kelas_id').value = '';
+                document.getElementById('nisn-field').style.display = 'none';
+                document.getElementById('nip-field').style.display = 'none';
+                document.getElementById('no_hp-field').style.display = 'none';
+            }
         }
     </script>
 @endpush

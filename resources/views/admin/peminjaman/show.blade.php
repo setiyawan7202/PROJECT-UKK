@@ -36,7 +36,11 @@
                 <div class="flex gap-6">
                     <div class="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
                         @if($peminjaman->barang->gambar)
-                            <img src="{{ asset('storage/' . $peminjaman->barang->gambar) }}" alt="{{ $peminjaman->barang->nama_barang }}" class="w-full h-full object-cover">
+                            @if(str_starts_with($peminjaman->barang->gambar, 'http'))
+                                <img src="{{ $peminjaman->barang->gambar }}" alt="{{ $peminjaman->barang->nama_barang }}" class="w-full h-full object-cover">
+                            @else
+                                <img src="{{ asset('storage/' . $peminjaman->barang->gambar) }}" alt="{{ $peminjaman->barang->nama_barang }}" class="w-full h-full object-cover">
+                            @endif
                         @else
                             <div class="flex items-center justify-center h-full text-gray-400">
                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">

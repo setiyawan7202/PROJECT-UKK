@@ -24,13 +24,10 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <style>
-        /* Select2 Customization to match Tailwind */
         .select2-container .select2-selection--single {
             height: 48px !important;
             border: 1px solid #e5e7eb !important;
-            /* border-gray-200 */
             border-radius: 0.75rem !important;
-            /* rounded-xl */
             padding: 0.5rem 0.5rem !important;
             display: flex !important;
             align-items: center !important;
@@ -45,7 +42,6 @@
             line-height: normal !important;
             padding-left: 10px !important;
             color: #111827 !important;
-            /* text-gray-900 */
         }
 
         .select2-dropdown {
@@ -60,12 +56,10 @@
             padding: 0.5rem !important;
         }
 
-        /* Hide Select2 original element to prevent FOUC */
         select.searchable-select {
             visibility: hidden;
         }
 
-        /* Mobile Sidebar */
         .sidebar {
             transition: transform 0.3s ease;
         }
@@ -263,18 +257,14 @@
 
     <script>
         $(document).ready(function () {
-            // Initialize Select2Globally
             $('.searchable-select').select2({
                 placeholder: "Pilih opsi...",
                 allowClear: true,
                 width: '100%'
             });
-
-            // Re-init Select2 when creating dynamic content (if any) or handle manually
         });
     </script>
     <script>
-        // Mobile sidebar toggle
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
         const menuToggle = document.getElementById('menu-toggle');

@@ -18,9 +18,6 @@ class Kelas extends Model
         'tingkat',
     ];
 
-    /**
-     * Get all students (siswa) in this class
-     */
     public function siswa()
     {
         return $this->hasMany(Siswa::class, 'kelas_id');

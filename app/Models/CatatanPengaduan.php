@@ -17,17 +17,11 @@ class CatatanPengaduan extends Model
         'catatan',
     ];
 
-    /**
-     * Get the complaint that owns the note.
-     */
     public function pengaduan()
     {
         return $this->belongsTo(Pengaduan::class, 'pengaduan_id');
     }
 
-    /**
-     * Get the user who created the note.
-     */
     public function user()
     {
         return $this->belongsTo(Auth::class, 'user_id');

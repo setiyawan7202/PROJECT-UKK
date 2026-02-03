@@ -37,7 +37,6 @@ class LoginController extends Controller
         AuthFacade::login($user);
         $request->session()->regenerate();
 
-        // Redirect based on role
         if ($user->role === 'admin') {
             return redirect()->intended('/admin');
         }
@@ -46,7 +45,6 @@ class LoginController extends Controller
             return redirect()->intended('/staff');
         }
 
-        // Default for pengguna role
         return redirect()->intended('/main');
     }
 

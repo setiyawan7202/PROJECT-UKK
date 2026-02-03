@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Peminjaman extends Model
 {
     use SoftDeletes;
+
     protected $table = 'peminjaman';
 
     protected $fillable = [
@@ -24,9 +25,6 @@ class Peminjaman extends Model
         'keterangan_penolakan',
     ];
 
-    /**
-     * Generate kode peminjaman otomatis dengan format PMJ00001
-     */
     public static function generateKode(): string
     {
         $prefix = 'PMJ';

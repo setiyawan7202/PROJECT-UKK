@@ -17,8 +17,8 @@ class Pengaduan extends Model
         'user_id',
         'judul',
         'deskripsi',
-        'lokasi', // Keep for backward compatibility
-        'jenis_sarpras', // Keep for backward compatibility
+        'lokasi',
+        'jenis_sarpras',
         'ruangan_id',
         'barang_id',
         'barang_unit_id',
@@ -27,9 +27,6 @@ class Pengaduan extends Model
         'foto',
     ];
 
-    /**
-     * Generate kode pengaduan otomatis dengan format PGD00001
-     */
     public static function generateKode(): string
     {
         $prefix = 'PGD';
@@ -48,33 +45,21 @@ class Pengaduan extends Model
         return $prefix . '-' . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
     }
 
-    /**
-     * Get the user that owns the complaint.
-     */
     public function user()
     {
         return $this->belongsTo(Auth::class, 'user_id');
     }
 
-    /**
-     * Get the notes for the complaint.
-     */
     public function catatan()
     {
         return $this->hasMany(CatatanPengaduan::class, 'pengaduan_id');
     }
 
-    /**
-     * Get the ruangan (room) for this complaint.
-     */
     public function ruangan()
     {
         return $this->belongsTo(Ruangan::class, 'ruangan_id');
     }
 
-    /**
-     * Get the barang (item) for this complaint.
-     */
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'barang_id');

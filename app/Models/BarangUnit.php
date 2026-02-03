@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class BarangUnit extends Model
 {
     use SoftDeletes;
+
     protected $table = 'barang_unit';
     protected $fillable = ['barang_id', 'kode_unit', 'kondisi', 'status'];
 
@@ -21,27 +22,20 @@ class BarangUnit extends Model
         return $this->hasMany(Peminjaman::class);
     }
 
-    /**
-     * Generate kode prefix 3 huruf dari nama barang
-     * Contoh: "Tablet" -> "TAB", "Kursi" -> "KRS", "Meja Belajar" -> "MJB"
-     */
     public static function generatePrefix(string $namaBarang): string
     {
         $nama = strtoupper(trim($namaBarang));
         $words = preg_split('/\s+/', $nama);
 
         if (count($words) === 1) {
-            // Single word: ambil 3 huruf pertama
             return substr($nama, 0, 3);
         } else {
-            // Multiple words: ambil huruf pertama dari setiap kata (max 3)
             $prefix = '';
             foreach ($words as $word) {
                 if (strlen($prefix) < 3 && strlen($word) > 0) {
                     $prefix .= $word[0];
                 }
             }
-            // Jika kurang dari 3, tambah dari kata pertama
             if (strlen($prefix) < 3) {
                 $prefix .= substr($words[0], 1, 3 - strlen($prefix));
             }
@@ -49,22 +43,16 @@ class BarangUnit extends Model
         }
     }
 
-    /**
-     * Generate kode unit dengan format PREFIX-XXX-XXX-XXX
-     * Contoh: TAB-000-000-001, TAB-000-000-002
-     */
     public static function generateKodeUnits(string $namaBarang, int $jumlah): array
     {
         $prefix = self::generatePrefix($namaBarang);
 
-        // Cari nomor terakhir dengan prefix ini
         $lastUnit = self::withTrashed()
             ->where('kode_unit', 'like', $prefix . '-%')
             ->orderByRaw("CAST(REPLACE(REPLACE(kode_unit, '{$prefix}-', ''), '-', '') AS UNSIGNED) DESC")
             ->first();
 
         if ($lastUnit) {
-            // Parse nomor dari kode terakhir (PREFIX-XXX-XXX-XXX)
             $parts = explode('-', $lastUnit->kode_unit);
             if (count($parts) === 4) {
                 $lastNumber = (int) ($parts[1] . $parts[2] . $parts[3]);

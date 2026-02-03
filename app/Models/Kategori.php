@@ -8,12 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Kategori extends Model
 {
     use SoftDeletes;
+
     protected $table = 'kategori';
     protected $fillable = ['kode_kategori', 'nama_kategori', 'deskripsi'];
 
-    /**
-     * Generate kode kategori otomatis dengan format KAT00001
-     */
     public static function generateKode(): string
     {
         $prefix = 'KAT';

@@ -58,17 +58,14 @@ class BarangController extends Controller
 
         DB::beginTransaction();
         try {
-            // Generate kode dari nama barang
             $kode = BarangUnit::generatePrefix($request->nama_barang);
 
-            // Handle image upload
             $gambarPath = null;
             if ($request->hasFile('gambar')) {
                 $imageService = new ImageUploadService();
                 $gambarPath = $imageService->upload($request->file('gambar'), 'barang_' . time());
             }
 
-            // Create barang record
             $barang = Barang::create([
                 'kode' => $kode,
                 'nama_barang' => $request->nama_barang,
@@ -80,10 +77,8 @@ class BarangController extends Controller
                 'gambar' => $gambarPath,
             ]);
 
-            // Generate unit codes
             $kodes = BarangUnit::generateKodeUnits($request->nama_barang, $request->jumlah_stok);
 
-            // Create individual units with default kondisi 'Baik'
             foreach ($kodes as $kode) {
                 BarangUnit::create([
                     'barang_id' => $barang->id,
@@ -131,9 +126,7 @@ class BarangController extends Controller
             'gambar' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
         ]);
 
-        // Handle image upload
         if ($request->hasFile('gambar')) {
-            // Note: Old images on ImgBB cannot be deleted via API
             $imageService = new ImageUploadService();
             $barang->gambar = $imageService->upload($request->file('gambar'), 'barang_' . time());
         }
@@ -155,7 +148,6 @@ class BarangController extends Controller
     {
         $barang = Barang::findOrFail($id);
 
-        // Delete image if exists
         if ($barang->gambar && Storage::disk('public')->exists($barang->gambar)) {
             Storage::disk('public')->delete($barang->gambar);
         }
@@ -166,9 +158,6 @@ class BarangController extends Controller
             ->with('success', 'Barang berhasil dihapus!');
     }
 
-    /**
-     * Update kondisi atau status unit
-     */
     public function updateUnit(Request $request, $id)
     {
         $unit = BarangUnit::findOrFail($id);

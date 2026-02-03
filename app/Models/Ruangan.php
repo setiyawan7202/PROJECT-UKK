@@ -8,12 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Ruangan extends Model
 {
     use SoftDeletes;
+
     protected $table = 'ruangan';
     protected $fillable = ['kode_ruangan', 'nama_ruangan', 'lokasi', 'keterangan'];
 
-    /**
-     * Generate kode ruangan otomatis dengan format RNG00001
-     */
     public static function generateKode(): string
     {
         $prefix = 'RNG';

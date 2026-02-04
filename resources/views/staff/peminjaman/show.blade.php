@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+@extends('layouts.staff')
 
 @section('title', 'Detail Peminjaman')
 
 @section('content')
     <div class="mb-6 flex items-center gap-4">
-        <a href="{{ route('admin.peminjaman.index') }}"
+        <a href="{{ route('staff.peminjaman.index') }}"
             class="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">
             <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -133,7 +133,6 @@
                     @if($peminjaman->status == 'completed' && $peminjaman->pengembalian)
                         <div class="sm:col-span-2 mt-4 pt-4 border-t border-gray-100">
                             <h4 class="font-bold text-gray-900 mb-4">Informasi Pengembalian</h4>
-                            <!-- ... (same return info) ... -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <span class="text-xs text-gray-500 block">Tanggal Kembali Aktual</span>
@@ -160,7 +159,7 @@
 
         <!-- Right Column: Borrower & Actions -->
         <div class="space-y-6">
-            <!-- Informasi Peminjam (No changes) -->
+            <!-- Informasi Peminjam -->
             <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-50">Informasi Peminjam</h3>
                 <div class="flex items-center gap-4 mb-4">
@@ -191,7 +190,7 @@
                 </dl>
             </div>
 
-            <!-- Aksi Admin -->
+            <!-- Aksi Petugas -->
             <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-50">Aksi</h3>
 
@@ -220,7 +219,7 @@
                             Peminjaman disetujui. Unit dialokasikan:
                             <strong>{{ $peminjaman->barangUnit->kode_unit ?? '-' }}</strong>.
                         </div>
-                        <form action="{{ route('admin.peminjaman.activate', $peminjaman->id) }}" method="POST"
+                        <form action="{{ route('staff.peminjaman.activate', $peminjaman->id) }}" method="POST"
                             onsubmit="return confirm('Konfirmasi pengambilan barang?')">
                             @csrf
                             <button type="submit"
@@ -228,7 +227,7 @@
                                 Konfirmasi Barang Diambil
                             </button>
                         </form>
-                        <a href="{{ route('admin.peminjaman.bukti', $peminjaman->id) }}" target="_blank"
+                        <a href="{{ route('staff.peminjaman.bukti', $peminjaman->id) }}" target="_blank"
                             class="block w-full text-center py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition">
                             Cetak Bukti Peminjaman
                         </a>
@@ -239,11 +238,11 @@
                             class="bg-gray-50 text-gray-800 border border-gray-100 p-3 rounded-lg text-xs leading-relaxed mb-3">
                             Jatuh tempo: {{ $peminjaman->tgl_kembali_rencana->format('d M Y') }}.
                         </div>
-                        <a href="{{ route('admin.peminjaman.return', $peminjaman->id) }}"
+                        <a href="{{ route('staff.peminjaman.return', $peminjaman->id) }}"
                             class="block w-full text-center py-2.5 bg-black hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition shadow-sm">
                             Proses Pengembalian
                         </a>
-                        <a href="{{ route('admin.peminjaman.bukti', $peminjaman->id) }}" target="_blank"
+                        <a href="{{ route('staff.peminjaman.bukti', $peminjaman->id) }}" target="_blank"
                             class="block w-full text-center py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition">
                             Cetak Bukti Peminjaman
                         </a>
@@ -252,7 +251,7 @@
                     <div class="bg-gray-50 text-gray-600 border border-gray-200 p-4 rounded-lg text-center text-sm">
                         Peminjaman Selesai.
                     </div>
-                    <a href="{{ route('admin.peminjaman.bukti', $peminjaman->id) }}" target="_blank"
+                    <a href="{{ route('staff.peminjaman.bukti', $peminjaman->id) }}" target="_blank"
                         class="block w-full text-center py-2.5 mt-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition">
                         Cetak Bukti Riwayat
                     </a>
@@ -276,7 +275,7 @@
                         class="font-bold text-gray-900">{{ $peminjaman->jumlah }} Unit</span></p>
             </div>
 
-            <form id="approveForm" method="POST" action="{{ route('admin.peminjaman.approve', $peminjaman->id) }}">
+            <form id="approveForm" method="POST" action="{{ route('staff.peminjaman.approve', $peminjaman->id) }}">
                 @csrf
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2">Pilih Unit (Pilih {{ $peminjaman->jumlah }})</label>
@@ -295,7 +294,7 @@
         </div>
     </div>
 
-    <!-- Modal Reject (Unchanged but ensuring it exists) -->
+    <!-- Modal Reject -->
     <div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
         <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl transform transition-all">
             <h3 class="text-lg font-bold mb-4 text-gray-900">Tolak Peminjaman</h3>
@@ -322,7 +321,8 @@
         // Data from Controller
         const loanQty = {{ $peminjaman->jumlah }};
         // Available units filtered by ACTIVE status only
-        const availableUnits = @json($peminjaman->barang->units->where('status', 'aktif')->map(function($u){ return ['id' => $u->id, 'kode' => $u->kode_unit]; })->values());
+        const availableUnits = @json($peminjaman->barang->units->where('status', 'aktif')->map(function ($u) {
+        return ['id' => $u->id, 'kode' => $u->kode_unit]; })->values());
 
         function openApproveModal() {
             const container = document.getElementById('unitInputsContainer');
@@ -332,19 +332,19 @@
             if (availableUnits.length < loanQty) {
                 const missing = loanQty - availableUnits.length;
                 container.innerHTML = `
-                    <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-4">
-                        <p class="font-bold flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                            Stok Tidak Mencukupi!
-                        </p>
-                        <p class="text-sm mt-1">Permintaan: <strong>${loanQty}</strong> unit. Tersedia: <strong>${availableUnits.length}</strong> unit.</p>
-                        <p class="text-sm mt-1">Harap tolak permintaan ini atau minta user mengajukan ulang dengan jumlah sesuai stok.</p>
-                    </div>`;
-                
+                        <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-4">
+                            <p class="font-bold flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                Stok Tidak Mencukupi!
+                            </p>
+                            <p class="text-sm mt-1">Permintaan: <strong>${loanQty}</strong> unit. Tersedia: <strong>${availableUnits.length}</strong> unit.</p>
+                            <p class="text-sm mt-1">Harap tolak permintaan ini atau minta user mengajukan ulang dengan jumlah sesuai stok.</p>
+                        </div>`;
+
                 // Disable submit button inside the form
                 const submitBtn = document.querySelector('#approveForm button[type="submit"]');
-                if(submitBtn) submitBtn.disabled = true;
-                if(submitBtn) submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                if (submitBtn) submitBtn.disabled = true;
+                if (submitBtn) submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
                 document.getElementById('approveModal').classList.remove('hidden');
                 return;
@@ -352,8 +352,8 @@
 
             // Enable submit button
             const submitBtn = document.querySelector('#approveForm button[type="submit"]');
-            if(submitBtn) submitBtn.disabled = false;
-            if(submitBtn) submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            if (submitBtn) submitBtn.disabled = false;
+            if (submitBtn) submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 
 
             // Generate Unit Selects
@@ -370,11 +370,11 @@
                 const div = document.createElement('div');
                 div.className = "bg-gray-50 p-3 rounded-lg border border-gray-200";
                 div.innerHTML = `
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Unit Ke-${i+1}</label>
-                    <select name="barang_unit_ids[]" class="w-full bg-white border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-black focus:border-black transition" required>
-                        ${options}
-                    </select>
-                `;
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Unit Ke-${i + 1}</label>
+                        <select name="barang_unit_ids[]" class="w-full bg-white border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-black focus:border-black transition" required>
+                            ${options}
+                        </select>
+                    `;
                 container.appendChild(div);
             }
 
@@ -387,7 +387,7 @@
 
         function openRejectModal(id) {
             document.getElementById('rejectModal').classList.remove('hidden');
-            document.getElementById('rejectForm').action = `/admin/peminjaman/${id}/reject`;
+            document.getElementById('rejectForm').action = `/staff/peminjaman/${id}/reject`;
         }
 
         function closeRejectModal() {

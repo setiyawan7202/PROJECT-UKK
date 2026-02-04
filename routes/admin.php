@@ -47,11 +47,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/peminjaman/{id}', [App\Http\Controllers\Admin\PeminjamanController::class, 'show'])->name('peminjaman.show');
     Route::post('/peminjaman/{id}/approve', [App\Http\Controllers\Admin\PeminjamanController::class, 'approve'])->name('peminjaman.approve');
     Route::post('/peminjaman/{id}/reject', [App\Http\Controllers\Admin\PeminjamanController::class, 'reject'])->name('peminjaman.reject');
-    Route::post('/peminjaman/{id}/activate', [App\Http\Controllers\Admin\PeminjamanController::class, 'activate'])->name('peminjaman.activate');
-    Route::get('/peminjaman/{id}/bukti', [App\Http\Controllers\Admin\PeminjamanController::class, 'cetakBukti'])->name('peminjaman.bukti');
 
-    Route::get('/peminjaman/{id}/return', [App\Http\Controllers\Admin\PeminjamanController::class, 'returnForm'])->name('peminjaman.return');
-    Route::post('/peminjaman/{id}/return', [App\Http\Controllers\Admin\PeminjamanController::class, 'storeReturn'])->name('peminjaman.storeReturn');
+    Route::middleware(['block.weekend'])->group(function () {
+        Route::post('/peminjaman/{id}/activate', [App\Http\Controllers\Admin\PeminjamanController::class, 'activate'])->name('peminjaman.activate');
+        Route::get('/peminjaman/{id}/return', [App\Http\Controllers\Admin\PeminjamanController::class, 'returnForm'])->name('peminjaman.return');
+        Route::post('/peminjaman/{id}/return', [App\Http\Controllers\Admin\PeminjamanController::class, 'storeReturn'])->name('peminjaman.storeReturn');
+    });
+
+    Route::get('/peminjaman/{id}/bukti', [App\Http\Controllers\Admin\PeminjamanController::class, 'cetakBukti'])->name('peminjaman.bukti');
 
     Route::get('/pengaduan', [App\Http\Controllers\Admin\PengaduanController::class, 'index'])->name('pengaduan.index');
     Route::get('/pengaduan/{id}', [App\Http\Controllers\Admin\PengaduanController::class, 'show'])->name('pengaduan.show');

@@ -8,6 +8,20 @@
         <p class="text-gray-500">Daftar peminjaman barang yang Anda ajukan</p>
     </div>
 
+    @if(now()->isWeekend())
+        <div class="mb-6 p-4 bg-orange-50 border border-orange-200 text-orange-800 rounded-xl flex items-center gap-3">
+            <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+                <span class="font-bold">Pelayanan Tutup</span>
+                <p class="text-sm mt-1">Hari ini adalah hari libur (Sabtu/Minggu). Layanan peminjaman dan pengembalian barang
+                    tutup.</p>
+            </div>
+        </div>
+    @endif
+
     @if(session('success'))
         <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm">
             {{ session('success') }}
@@ -22,16 +36,16 @@
                         <th class="px-6 py-4 font-semibold">Kode Pinjam</th>
                         <th class="px-6 py-4 font-semibold">Barang</th>
                         <th class="px-6 py-4 font-semibold">Tgl Pinjam</th>
-                        <th class="px-6 py-4 font-semibold">Tgl Kembali (Rencana)</th>
+                        <th class="px-6 py-4 font-semibold">Tgl Kembali</th>
                         <th class="px-6 py-4 font-semibold">Status</th>
                         <th class="px-6 py-4 font-semibold">Kode Unit</th>
-                        <th class="px-6 py-4 font-semibold">Keterangan</th>
+                        <th class="px-6 py-4 font-semibold">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($peminjaman as $item)
                         <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 font-mono text-xs text-blue-600 font-medium">
+                            <td class="px-6 py-4 font-mono text-xs font-medium bg-gray-100 rounded">
                                 {{ $item->kode ?? '-' }}
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-900">
@@ -41,37 +55,50 @@
                             <td class="px-6 py-4">{{ $item->tgl_pinjam->format('d M Y') }}</td>
                             <td class="px-6 py-4">{{ $item->tgl_kembali_rencana->format('d M Y') }}</td>
                             <td class="px-6 py-4">
-                                @if($item->status == 'pending')
-                                    <span
-                                        class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold">Menunggu</span>
-                                @elseif($item->status == 'approved')
-                                    <span
-                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold">Disetujui</span>
-                                @elseif($item->status == 'active')
-                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">Sedang
-                                        Dipinjam</span>
-                                @elseif($item->status == 'completed')
-                                    <span
-                                        class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-semibold">Selesai</span>
-                                @elseif($item->status == 'rejected')
-                                    <span
-                                        class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">Ditolak</span>
-                                @endif
+                                @php
+                                    $statusColors = [
+                                        'pending' => 'bg-gray-100 text-gray-600 border border-gray-200',
+                                        'approved' => 'bg-black text-white border border-black',
+                                        'active' => 'bg-gray-800 text-white border border-gray-800',
+                                        'completed' => 'bg-white text-gray-800 border border-gray-300',
+                                        'rejected' => 'bg-white text-red-600 border border-red-200',
+                                    ];
+                                    $statusLabels = [
+                                        'pending' => 'Menunggu',
+                                        'approved' => 'Disetujui',
+                                        'active' => 'Dipinjam',
+                                        'completed' => 'Selesai',
+                                        'rejected' => 'Ditolak',
+                                    ];
+                                @endphp
+                                <span
+                                    class="px-2.5 py-1 rounded-md text-xs font-bold {{ $statusColors[$item->status] ?? 'bg-gray-100' }}">
+                                    {{ $statusLabels[$item->status] ?? ucfirst($item->status) }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 font-mono text-xs">
                                 {{ $item->barangUnit->kode_unit ?? '-' }}
                             </td>
-                            <td class="px-6 py-4 text-gray-500 text-xs">
-                                @if($item->status == 'rejected')
-                                    <span class="text-red-600">Alasan: {{ $item->keterangan_penolakan }}</span>
-                                @else
-                                    {{ Str::limit($item->tujuan_pinjam, 30) }}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <a href="{{ route('peminjaman.show', $item->id) }}"
+                                    class="text-gray-700 hover:text-black font-medium underline">Detail</a>
+
+                                @if($item->status == 'pending')
+                                    <form action="{{ route('peminjaman.destroy', $item->id) }}" method="POST"
+                                        class="inline-block ml-3"
+                                        onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengajuan ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900 font-medium underline">
+                                            Batal
+                                        </button>
+                                    </form>
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                                 <p>Belum ada riwayat peminjaman.</p>
                             </td>
                         </tr>

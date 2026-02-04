@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.staff')
 
 @section('title', 'Manajemen Peminjaman')
 
@@ -22,7 +22,7 @@
 
     <!-- Filters -->
     <div class="bg-white p-4 rounded-xl border border-gray-100 mb-6">
-        <form method="GET" action="{{ route('admin.peminjaman.index') }}" class="flex gap-4">
+        <form method="GET" action="{{ route('staff.peminjaman.index') }}" class="flex gap-4">
             <select name="status" class="px-4 py-2 border rounded-lg text-sm focus:ring-black focus:border-black"
                 onchange="this.form.submit()">
                 <option value="">Semua Status</option>
@@ -97,13 +97,13 @@
                             <td class="px-6 py-4 text-right">
                                 @if($item->status == 'pending')
                                     <div class="flex justify-end gap-2">
-                                        <a href="{{ route('admin.peminjaman.show', $item->id) }}"
+                                        <a href="{{ route('staff.peminjaman.show', $item->id) }}"
                                             class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50 font-medium">
                                             Detail
                                         </a>
-                                        <button
-                                            onclick='openApproveModal("{{ $item->id }}", "{{ $item->barang->nama_barang }}", {{ $item->jumlah }}, @json($item->barang->units->where("status", "aktif")->map(function ($u) {
-                                            return ["id" => $u->id, "kode" => $u->kode_unit]; })->values()))'
+                                        <button onclick='openApproveModal("{{ $item->id }}", "{{ $item->barang->nama_barang }}", {{ $item->jumlah }}, @json($item->barang->units->where("status", "aktif")->map(function ($u) {
+                                            return ["id" => $u->id, "kode" => $u->kode_unit];
+                                        })->values()))'
                                             class="bg-black text-white px-3 py-1 rounded-lg text-xs hover:bg-gray-800">
                                             Approve
                                         </button>
@@ -115,7 +115,7 @@
                                 @elseif($item->status == 'approved')
                                     <!-- Approved Actions -->
                                     <div class="flex justify-end gap-2">
-                                        <form action="{{ route('admin.peminjaman.activate', $item->id) }}" method="POST"
+                                        <form action="{{ route('staff.peminjaman.activate', $item->id) }}" method="POST"
                                             onsubmit="return confirm('Konfirmasi pengambilan barang?')">
                                             @csrf
                                             <button type="submit"
@@ -123,32 +123,32 @@
                                                 Ambil Barang
                                             </button>
                                         </form>
-                                        <a href="{{ route('admin.peminjaman.show', $item->id) }}"
+                                        <a href="{{ route('staff.peminjaman.show', $item->id) }}"
                                             class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50 font-medium">
                                             Detail
                                         </a>
-                                        <a href="{{ route('admin.peminjaman.bukti', $item->id) }}" target="_blank"
+                                        <a href="{{ route('staff.peminjaman.bukti', $item->id) }}" target="_blank"
                                             class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50">
                                             Cetak Bukti
                                         </a>
                                     </div>
                                 @elseif($item->status == 'active')
                                     <!-- Active Actions -->
-                                    <a href="{{ route('admin.peminjaman.return', $item->id) }}"
+                                    <a href="{{ route('staff.peminjaman.return', $item->id) }}"
                                         class="bg-black text-white px-3 py-1 rounded-lg text-xs hover:bg-gray-800">
                                         Kembalikan
                                     </a>
-                                    <a href="{{ route('admin.peminjaman.show', $item->id) }}"
+                                    <a href="{{ route('staff.peminjaman.show', $item->id) }}"
                                         class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50 font-medium">
                                         Detail
                                     </a>
-                                    <a href="{{ route('admin.peminjaman.bukti', $item->id) }}" target="_blank"
+                                    <a href="{{ route('staff.peminjaman.bukti', $item->id) }}" target="_blank"
                                         class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50">
                                         Cetak Bukti
                                     </a>
                                 @else
                                     <div class="flex justify-end gap-2">
-                                        <a href="{{ route('admin.peminjaman.show', $item->id) }}"
+                                        <a href="{{ route('staff.peminjaman.show', $item->id) }}"
                                             class="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs hover:bg-gray-50 font-medium">
                                             Detail
                                         </a>
@@ -223,7 +223,7 @@
     <script>
         function openApproveModal(id, itemName, loanQty, availableUnits) {
             document.getElementById('approveModal').classList.remove('hidden');
-            document.getElementById('approveForm').action = `/admin/peminjaman/${id}/approve`;
+            document.getElementById('approveForm').action = `/staff/peminjaman/${id}/approve`;
             document.getElementById('approveItemName').innerText = itemName;
             document.getElementById('approveQtyInfo').innerHTML = `Jumlah Diminta: <span class="font-bold text-gray-900">${loanQty} Unit</span>`;
 
@@ -234,14 +234,14 @@
             if (availableUnits.length < loanQty) {
                 const missing = loanQty - availableUnits.length;
                 container.innerHTML = `
-                        <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-4">
-                            <p class="font-bold flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                Stok Tidak Mencukupi!
-                            </p>
-                            <p class="text-sm mt-1">Permintaan: <strong>${loanQty}</strong> unit. Tersedia: <strong>${availableUnits.length}</strong> unit.</p>
-                            <p class="text-sm mt-1">Harap tolak permintaan ini atau minta user mengajukan ulang dengan jumlah sesuai stok.</p>
-                        </div>`;
+                            <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-4">
+                                <p class="font-bold flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    Stok Tidak Mencukupi!
+                                </p>
+                                <p class="text-sm mt-1">Permintaan: <strong>${loanQty}</strong> unit. Tersedia: <strong>${availableUnits.length}</strong> unit.</p>
+                                <p class="text-sm mt-1">Harap tolak permintaan ini atau minta user mengajukan ulang dengan jumlah sesuai stok.</p>
+                            </div>`;
 
                 // Disable submit button
                 const submitBtn = document.querySelector('#approveForm button[type="submit"]');
@@ -273,11 +273,11 @@
                 const div = document.createElement('div');
                 div.className = "bg-gray-50 p-2 rounded-lg border border-gray-200 text-sm";
                 div.innerHTML = `
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Unit Ke-${i + 1}</label>
-                        <select name="barang_unit_ids[]" class="w-full bg-white border border-gray-300 rounded p-1.5 focus:ring-1 focus:ring-black focus:border-black" required>
-                            ${options}
-                        </select>
-                    `;
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Unit Ke-${i + 1}</label>
+                            <select name="barang_unit_ids[]" class="w-full bg-white border border-gray-300 rounded p-1.5 focus:ring-1 focus:ring-black focus:border-black" required>
+                                ${options}
+                            </select>
+                        `;
                 container.appendChild(div);
             }
         }
@@ -288,7 +288,7 @@
 
         function openRejectModal(id) {
             document.getElementById('rejectModal').classList.remove('hidden');
-            document.getElementById('rejectForm').action = `/admin/peminjaman/${id}/reject`;
+            document.getElementById('rejectForm').action = `/staff/peminjaman/${id}/reject`;
         }
 
         function closeRejectModal() {

@@ -5,6 +5,8 @@
 @push('styles')
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         /* Custom Select2 styling to match design system */
         .select2-container .select2-selection--single {
@@ -54,6 +56,13 @@
         .select2-container--default .select2-search--dropdown .select2-search__field:focus {
             border-color: #000 !important;
             outline: none !important;
+        }
+        
+        /* Flatpickr override */
+        .flatpickr-calendar {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+            border-radius: 0.5rem !important;
+            border: 1px solid #e5e7eb !important;
         }
     </style>
 @endpush
@@ -128,9 +137,10 @@
             <div class="mb-5">
                 <label for="tgl_pinjam" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Pinjam <span
                         class="text-red-500">*</span></label>
-                <input type="date" id="tgl_pinjam" name="tgl_pinjam"
+                <input type="text" id="tgl_pinjam" name="tgl_pinjam"
                     value="{{ old('tgl_pinjam', $today ?? date('Y-m-d')) }}" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition">
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition bg-white" readonly placeholder="Pilih tanggal pinjam...">
+                <p class="text-gray-500 text-xs mt-1">Tidak dapat memilih hari Sabtu dan Minggu</p>
                 @error('tgl_pinjam')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
@@ -140,9 +150,11 @@
             <div class="mb-5">
                 <label for="tgl_kembali_rencana" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Kembali
                     (Rencana) <span class="text-red-500">*</span></label>
-                <input type="date" id="tgl_kembali_rencana" name="tgl_kembali_rencana"
+                <input type="text" id="tgl_kembali_rencana" name="tgl_kembali_rencana"
                     value="{{ old('tgl_kembali_rencana', $tomorrow ?? date('Y-m-d', strtotime('+1 day'))) }}" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition">
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition bg-white" readonly placeholder="Pilih estimasi kembali...">
+                <p class="text-gray-500 text-xs mt-1">Maksimal 7 hari dari tanggal pinjam, tidak dapat memilih hari Sabtu
+                    dan Minggu</p>
                 @error('tgl_kembali_rencana')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
@@ -180,6 +192,9 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Select2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
     <script>
         $(document).ready(function () {
             // Initialize Select2 for Barang dropdown if it exists
@@ -189,14 +204,74 @@
                     allowClear: true,
                     width: '100%',
                     language: {
-                        noResults: function () {
-                            return "Barang tidak ditemukan";
-                        },
-                        searching: function () {
-                            return "Mencari...";
-                        }
+                        noResults: function () { return "Barang tidak ditemukan"; },
+                        searching: function () { return "Mencari..."; }
                     }
                 });
+            }
+
+            // Flatpickr Configuration
+            const today = new Date();
+            
+            // Function to disable weekends (Sunday=0, Saturday=6)
+            const disableWeekends = function(date) {
+                return (date.getDay() === 0 || date.getDay() === 6);
+            };
+
+            // Initialize Borrow Date Picker
+            const fpPinjam = flatpickr("#tgl_pinjam", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: [disableWeekends],
+                locale: "id",
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length > 0) {
+                        const borrowDate = selectedDates[0];
+                        
+                        // Update Return Date constraints
+                        const maxReturnDate = new Date(borrowDate);
+                        maxReturnDate.setDate(maxReturnDate.getDate() + 7);
+
+                        fpKembali.set('minDate', borrowDate);
+                        fpKembali.set('maxDate', maxReturnDate);
+                        
+                        // If current return date is invalid (before new min or after new max or weekend)
+                        const currentReturn = fpKembali.selectedDates[0];
+                        if (currentReturn) {
+                            if (currentReturn < borrowDate || currentReturn > maxReturnDate || disableWeekends(currentReturn)) {
+                                fpKembali.clear(); // Clear invalid date
+                            }
+                        } else {
+                             // Optional: Set default return date to avoid empty field logic if needed
+                        }
+                    }
+                }
+            });
+
+            // Initialize Return Date Picker
+            const fpKembali = flatpickr("#tgl_kembali_rencana", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: [disableWeekends],
+                locale: "id"
+            });
+            
+            // Initial Sync if values exist (e.g. from old input / validation error)
+            const initialBorrowStr = document.getElementById('tgl_pinjam').value;
+            if (initialBorrowStr) {
+                 const parts = initialBorrowStr.split('-');
+                 if (parts.length === 3) {
+                     // Month 0-indexed
+                     const initialBorrowDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                     if (!isNaN(initialBorrowDate.getTime())) {
+                         const maxReturnDate = new Date(initialBorrowDate);
+                         maxReturnDate.setDate(maxReturnDate.getDate() + 7);
+                         
+                         // Set min/max on return picker
+                         fpKembali.set('minDate', initialBorrowDate);
+                         fpKembali.set('maxDate', maxReturnDate);
+                     }
+                 }
             }
         });
     </script>

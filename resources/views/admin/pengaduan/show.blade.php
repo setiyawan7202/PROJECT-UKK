@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="mb-6">
-        <a href="{{ route('admin.pengaduan.index') }}"
-            class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-4 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="mb-6 flex items-center gap-4">
+        <a href="{{ route('admin.pengaduan.index') }}" class="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Kembali ke Daftar
         </a>
-        <h1 class="text-2xl font-bold text-gray-900">Detail Pengaduan #{{ $pengaduan->id }}</h1>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Detail Pengaduan</h1>
+            <p class="text-sm text-gray-500">Kode: <span class="font-mono font-bold text-gray-900">{{ $pengaduan->kode ?? '#'.$pengaduan->id }}</span></p>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Main Info -->
         <div class="lg:col-span-2 space-y-6">
             <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
                 <div class="flex justify-between items-start mb-6">
@@ -39,16 +39,23 @@
                         </div>
                     </div>
                     <div class="text-right">
-                        @if($pengaduan->status == 'pending')
-                            <span
-                                class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-medium">Pending</span>
-                        @elseif($pengaduan->status == 'processed')
-                            <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">Diproses</span>
-                        @elseif($pengaduan->status == 'completed')
-                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">Selesai</span>
-                        @else
-                            <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-medium">Ditolak</span>
-                        @endif
+                        @php
+                            $statusColors = [
+                                'pending' => 'bg-gray-100 text-gray-600 border border-gray-200',
+                                'processed' => 'bg-black text-white border border-black',
+                                'completed' => 'bg-white text-gray-800 border border-gray-300',
+                                'rejected' => 'bg-white text-gray-500 border border-gray-200',
+                            ];
+                            $statusLabels = [
+                                'pending' => 'Pending',
+                                'processed' => 'Diproses',
+                                'completed' => 'Selesai',
+                                'rejected' => 'Ditolak',
+                            ];
+                        @endphp
+                        <span class="px-3 py-1 rounded-md text-sm font-bold {{ $statusColors[$pengaduan->status] ?? 'bg-gray-100' }}">
+                            {{ $statusLabels[$pengaduan->status] ?? ucfirst($pengaduan->status) }}
+                        </span>
                     </div>
                 </div>
 
@@ -57,11 +64,10 @@
                     <p class="whitespace-pre-line">{{ $pengaduan->deskripsi }}</p>
                 </div>
 
-                {{-- Lokasi Ruangan --}}
                 @if($pengaduan->ruangan)
-                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-100">
                         <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -82,8 +88,7 @@
                             @endif
                             @if(!$pengaduan->barang)
                                 <div class="col-span-2">
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
                                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
                                                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -97,11 +102,10 @@
                     </div>
                 @endif
 
-                {{-- Barang Terdampak --}}
                 @if($pengaduan->barang)
-                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-100">
                         <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                             </svg>
@@ -114,32 +118,32 @@
                             </div>
                             <div>
                                 <span class="block text-gray-500 text-xs">Kategori</span>
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
                                     {{ $pengaduan->barang->kategori->nama_kategori ?? '-' }}
                                 </span>
                             </div>
                             @if($pengaduan->barangUnit)
                                 <div>
                                     <span class="block text-gray-500 text-xs">Kode Unit</span>
-                                    <span
-                                        class="font-mono bg-gray-200 px-2 py-0.5 rounded text-xs">{{ $pengaduan->barangUnit->kode_unit }}</span>
+                                    <span class="font-mono bg-gray-200 px-2 py-0.5 rounded text-xs">{{ $pengaduan->barangUnit->kode_unit }}</span>
                                 </div>
                                 <div>
                                     <span class="block text-gray-500 text-xs">Kondisi Unit</span>
-                                    <span
-                                        class="font-medium text-gray-900">{{ ucwords(str_replace('_', ' ', $pengaduan->barangUnit->kondisi ?? '-')) }}</span>
+                                    <span class="font-medium text-gray-900">{{ ucwords(str_replace('_', ' ', $pengaduan->barangUnit->kondisi ?? '-')) }}</span>
                                 </div>
                             @endif
                             @if($pengaduan->kondisi)
                                 <div class="col-span-2">
                                     <span class="block text-gray-500 text-xs mb-1">Kondisi Dilaporkan</span>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                                                                                @if($pengaduan->kondisi == 'baik') bg-green-100 text-green-700
-                                                                                                                @elseif($pengaduan->kondisi == 'rusak_ringan') bg-yellow-100 text-yellow-700
-                                                                                                                @elseif($pengaduan->kondisi == 'rusak_berat') bg-orange-100 text-orange-700
-                                                                                                                @else bg-red-100 text-red-700
-                                                                                                                @endif">
+                                    @php
+                                        $kondisiColors = [
+                                            'baik' => 'bg-white text-gray-800 border border-gray-300',
+                                            'rusak_ringan' => 'bg-gray-100 text-gray-700 border border-gray-200',
+                                            'rusak_berat' => 'bg-gray-800 text-white border border-gray-800',
+                                            'hilang' => 'bg-black text-white border border-black',
+                                        ];
+                                    @endphp
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium {{ $kondisiColors[$pengaduan->kondisi] ?? 'bg-gray-100 text-gray-700' }}">
                                         {{ ucwords(str_replace('_', ' ', $pengaduan->kondisi)) }}
                                     </span>
                                 </div>
@@ -147,7 +151,7 @@
                         </div>
                     </div>
                 @elseif($pengaduan->jenis_sarpras)
-                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-100">
                         <h3 class="font-semibold text-gray-900 mb-2">Jenis Sarpras</h3>
                         <p class="text-gray-700">{{ $pengaduan->jenis_sarpras }}</p>
                     </div>
@@ -162,9 +166,8 @@
                 @endif
             </div>
 
-            <!-- Responses -->
             <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Riwayat Tanggapan</h3>
+                <h3 class="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-50">Riwayat Tanggapan</h3>
 
                 <div class="space-y-4 mb-6">
                     @forelse($pengaduan->catatan as $catatan)
@@ -183,8 +186,7 @@
                 <form action="{{ route('admin.pengaduan.response', $pengaduan->id) }}" method="POST">
                     @csrf
                     <div class="mb-3">
-                        <label for="catatan" class="block text-sm font-medium text-gray-700 mb-2">Tambah Tanggapan /
-                            Catatan</label>
+                        <label for="catatan" class="block text-sm font-medium text-gray-700 mb-2">Tambah Tanggapan / Catatan</label>
                         <textarea name="catatan" id="catatan" rows="3"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
                             placeholder="Tulis tanggapan untuk pelapor..." required></textarea>
@@ -197,10 +199,9 @@
             </div>
         </div>
 
-        <!-- Sidebar Actions -->
         <div class="space-y-6">
             <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-                <h3 class="font-bold text-gray-900 mb-4">Aksi Pengaduan</h3>
+                <h3 class="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-50">Aksi Pengaduan</h3>
 
                 <form action="{{ route('admin.pengaduan.status', $pengaduan->id) }}" method="POST">
                     @csrf
@@ -211,10 +212,8 @@
                         <select name="status"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition bg-white mb-3">
                             <option value="pending" {{ $pengaduan->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="processed" {{ $pengaduan->status == 'processed' ? 'selected' : '' }}>Diproses
-                            </option>
-                            <option value="completed" {{ $pengaduan->status == 'completed' ? 'selected' : '' }}>Selesai
-                            </option>
+                            <option value="processed" {{ $pengaduan->status == 'processed' ? 'selected' : '' }}>Diproses</option>
+                            <option value="completed" {{ $pengaduan->status == 'completed' ? 'selected' : '' }}>Selesai</option>
                             <option value="rejected" {{ $pengaduan->status == 'rejected' ? 'selected' : '' }}>Ditolak</option>
                         </select>
                         <button type="submit"
@@ -225,10 +224,9 @@
                 </form>
             </div>
 
-            <!-- Pelapor Info -->
             <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-                <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-50 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
@@ -245,12 +243,7 @@
                     </div>
                     <div>
                         <span class="block text-gray-500 text-xs">Role</span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                @if($pengaduan->user->role == 'admin') bg-red-100 text-red-700
-                                                @elseif($pengaduan->user->role == 'staff') bg-blue-100 text-blue-700
-                                                @elseif($pengaduan->user->role == 'guru') bg-green-100 text-green-700
-                                                @else bg-gray-100 text-gray-700
-                                                @endif">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
                             {{ ucfirst($pengaduan->user->role) }}
                         </span>
                     </div>
@@ -262,8 +255,7 @@
                         @if($pengaduan->user->siswa->kelas)
                             <div>
                                 <span class="block text-gray-500 text-xs">Kelas</span>
-                                <span
-                                    class="font-medium text-gray-900">{{ $pengaduan->user->siswa->kelas->nama_kelas ?? '-' }}</span>
+                                <span class="font-medium text-gray-900">{{ $pengaduan->user->siswa->kelas->nama_kelas ?? '-' }}</span>
                             </div>
                         @endif
                     @endif

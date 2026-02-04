@@ -20,7 +20,14 @@ Route::middleware(['auth'])->group(function () {
     })->name('main.index');
 
     // User Peminjaman Routes
-    Route::resource('peminjaman', PeminjamanController::class)->only(['index', 'create', 'store', 'show']);
+    // User Peminjaman Routes (Weekend Protected)
+    Route::middleware(['block.weekend'])->group(function () {
+        Route::get('/peminjaman/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
+        Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');
+    });
+
+    Route::resource('peminjaman', PeminjamanController::class)->only(['index', 'show', 'destroy']);
+    Route::get('/peminjaman/{id}/download-pdf', [PeminjamanController::class, 'downloadPdf'])->name('peminjaman.download-pdf');
 
     // Katalog
     Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');

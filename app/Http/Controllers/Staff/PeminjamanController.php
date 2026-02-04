@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Models\Peminjaman;
 use App\Models\BarangUnit;
 use App\Services\ImageUploadService;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf; // Ensure barryvdh/laravel-dompdf is installed or handle manual print
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PeminjamanController extends Controller
 {
@@ -24,13 +24,13 @@ class PeminjamanController extends Controller
         }
 
         $peminjaman = $query->paginate(10);
-        return view('admin.peminjaman.index', compact('peminjaman'));
+        return view('staff.peminjaman.index', compact('peminjaman'));
     }
 
     public function show($id)
     {
         $peminjaman = Peminjaman::with(['user', 'barang', 'barangUnit', 'pengembalian'])->findOrFail($id);
-        return view('admin.peminjaman.show', compact('peminjaman'));
+        return view('staff.peminjaman.show', compact('peminjaman'));
     }
 
     /**
@@ -91,7 +91,7 @@ class PeminjamanController extends Controller
             $newPeminjaman->barang->decrement('jumlah_stok');
         }
 
-        return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman disetujui. ' . count($request->barang_unit_ids) . ' unit telah dialokasikan.');
+        return redirect()->route('staff.peminjaman.index')->with('success', 'Peminjaman disetujui. ' . count($request->barang_unit_ids) . ' unit telah dialokasikan.');
     }
 
     /**
@@ -148,7 +148,7 @@ class PeminjamanController extends Controller
             return back()->with('error', 'Bukti peminjaman hanya untuk status Disetujui/Aktif.');
         }
 
-        return view('admin.peminjaman.bukti', compact('peminjaman'));
+        return view('staff.peminjaman.bukti', compact('peminjaman'));
     }
 
     /**
@@ -167,7 +167,7 @@ class PeminjamanController extends Controller
             return back()->with('error', 'Hanya peminjaman aktif yang bisa dikembalikan.');
         }
 
-        return view('admin.peminjaman.return', compact('peminjaman'));
+        return view('staff.peminjaman.return', compact('peminjaman'));
     }
 
     /**
@@ -242,6 +242,6 @@ class PeminjamanController extends Controller
             }
         }
 
-        return redirect()->route('admin.peminjaman.index')->with('success', 'Barang berhasil dikembalikan.');
+        return redirect()->route('staff.peminjaman.index')->with('success', 'Barang berhasil dikembalikan.');
     }
 }

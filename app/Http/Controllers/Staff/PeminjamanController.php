@@ -148,7 +148,21 @@ class PeminjamanController extends Controller
             return back()->with('error', 'Bukti peminjaman hanya untuk status Disetujui/Aktif.');
         }
 
-        return view('staff.peminjaman.bukti', compact('peminjaman'));
+        // Generate QR Content (URL to this PDF)
+        $url = route('staff.peminjaman.bukti', $id);
+
+        // Render QR as SVG Base64 (Avoids ImageMagick dependency)
+        $qrRaw = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(150)->generate($url);
+        $qrCodeImage = 'data:image/svg+xml;base64,' . base64_encode($qrRaw);
+
+        $pdf = Pdf::loadView('staff.peminjaman.bukti', compact('peminjaman', 'qrCodeImage'));
+        $pdf->setPaper('A4', 'portrait');
+
+        // Inject Auto-Print JavaScript
+        $pdf->render();
+        // Auto-print removed upon request
+
+        return $pdf->stream('Bukti-Peminjaman-' . $peminjaman->kode . '.pdf');
     }
 
     /**
@@ -243,5 +257,20 @@ class PeminjamanController extends Controller
         }
 
         return redirect()->route('staff.peminjaman.index')->with('success', 'Barang berhasil dikembalikan.');
+    }
+
+    /**
+     * Redirect by Peminjaman Code (Handle QR Scan text-only)
+     */
+    public function redirectByKode($kode)
+    {
+        $peminjaman = Peminjaman::where('kode', $kode)->firstOrFail();
+
+        // If User is Admin or Superadmin, redirect to Admin view
+        if (auth()->user()->role == 'admin' || auth()->user()->role == 'superadmin') {
+            return redirect()->route('admin.peminjaman.bukti', $peminjaman->id);
+        }
+
+        return redirect()->route('staff.peminjaman.bukti', $peminjaman->id);
     }
 }

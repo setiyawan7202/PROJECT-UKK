@@ -103,6 +103,8 @@ class PengaduanController extends Controller
             'status' => 'pending',
         ]);
 
+        \App\Helpers\ActivityLogger::log('Pengaduan', 'Membuat pengaduan baru: ' . $request->judul);
+
         return redirect()->route('pengaduan.index')->with('success', 'Pengaduan berhasil dikirim.');
     }
 
@@ -133,6 +135,8 @@ class PengaduanController extends Controller
             'user_id' => Auth::id(),
             'catatan' => $request->catatan,
         ]);
+
+        \App\Helpers\ActivityLogger::log('Respon Pengaduan', 'Menambahkan balasan pengaduan: ' . $pengaduan->kode, $pengaduan);
 
         return redirect()->route('pengaduan.show', $id)->with('success', 'Balasan berhasil ditambahkan.');
     }

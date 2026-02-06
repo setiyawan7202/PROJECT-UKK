@@ -20,6 +20,7 @@ class Auth extends Authenticatable
         'password',
         'role',
         'status',
+        'permissions',
     ];
 
     protected $hidden = [
@@ -31,6 +32,7 @@ class Auth extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'permissions' => 'array',
         ];
     }
 
@@ -64,5 +66,21 @@ class Auth extends Authenticatable
         }
 
         return $this->email;
+    }
+
+    /**
+     * Check if user has specific permission
+     */
+    public function hasPermission($permission)
+    {
+        if ($this->role === 'admin') {
+            return true;
+        }
+
+        if ($this->role !== 'petugas') {
+            return false;
+        }
+
+        return in_array($permission, $this->permissions ?? []);
     }
 }

@@ -88,6 +88,22 @@
 
         <!-- Login Form -->
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+            @if (session('success'))
+                <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p class="text-sm text-green-600">{{ session('success') }}</p>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <ul class="text-sm text-red-600 list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('login.submit') }}">
                 @csrf
 
@@ -126,8 +142,16 @@
             </form>
         </div>
 
-        <!-- Back Link -->
+        <!-- Register Link -->
         <div class="text-center mt-6">
+            <p class="text-gray-500 text-sm">
+                Belum punya akun?
+                <a href="{{ route('register') }}" class="text-black font-medium hover:underline">Daftar di sini</a>
+            </p>
+        </div>
+
+        <!-- Back Link -->
+        <div class="text-center mt-4">
             <a href="/" class="text-gray-500 hover:text-gray-700 text-sm transition">
                 ← Kembali ke Beranda
             </a>

@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('peminjaman', PeminjamanController::class)->only(['index', 'show', 'destroy']);
     Route::get('/peminjaman/{id}/download-pdf', [PeminjamanController::class, 'downloadPdf'])->name('peminjaman.download-pdf');
+    Route::get('/peminjaman/{id}/cetak', [PeminjamanController::class, 'cetakBukti'])->name('peminjaman.cetak');
 
     // Katalog
     Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');

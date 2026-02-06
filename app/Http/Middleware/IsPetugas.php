@@ -15,7 +15,7 @@ class IsPetugas
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()->role == 'petugas' || auth()->user()->role == 'admin') {
+        if (auth()->user()->role == 'petugas' || auth()->user()->role == 'admin' || auth()->user()->role == 'superadmin') {
             return $next($request);
         }
         abort(403);

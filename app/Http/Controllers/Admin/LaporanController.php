@@ -8,6 +8,7 @@ use App\Models\Peminjaman;
 use App\Models\Pengaduan;
 use App\Models\BarangUnit;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
@@ -78,8 +79,29 @@ class LaporanController extends Controller
             ->orderBy('status')
             ->get();
 
+        // Tier 1 Analytics: Failed/Lost items
+        $damagedItems = BarangUnit::whereIn('status', ['rusak', 'hilang'])->with('barang')->get();
+
+        // Tier 1 Analytics: Most Problematic Items
+        $mostProblematic = \App\Models\Pengembalian::select('barang_id', DB::raw('count(*) as total_rusak'))
+            ->join('peminjaman', 'pengembalian.peminjaman_id', '=', 'peminjaman.id')
+            ->where('pengembalian.kondisi', '!=', 'baik')
+            ->groupBy('barang_id')
+            ->orderByDesc('total_rusak')
+            ->limit(10)
+            ->get();
+
+        // Fix: accessing barang name from relation
+        $mostProblematic->transform(function ($item) {
+            $barang = \App\Models\Barang::find($item->barang_id);
+            $item->nama_barang = $barang ? $barang->nama_barang : 'Unknown';
+            return $item;
+        });
+
         $pdf = Pdf::loadView('admin.laporan.pdf_barang', [
             'data' => $data,
+            'damagedItems' => $damagedItems,
+            'mostProblematic' => $mostProblematic,
             'date' => now()->format('Y-m-d'),
         ]);
 

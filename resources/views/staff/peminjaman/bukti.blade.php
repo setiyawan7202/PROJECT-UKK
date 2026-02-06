@@ -2,225 +2,203 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Bukti Peminjaman</title>
     <style>
-        @page {
-            margin: 20px;
-        }
-
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+            font-family: 'DejaVu Sans', sans-serif;
+            padding: 30px;
+            font-size: 11px;
+            color: #333;
         }
 
         .header {
             text-align: center;
-            border-bottom: 3px solid #000;
+            border-bottom: 2px solid #000;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
 
         .header h1 {
+            font-size: 16px;
+            font-weight: bold;
             margin: 0;
-            font-size: 24px;
         }
 
-        .header p {
-            margin: 5px 0;
+        .header h2 {
             font-size: 12px;
+            margin: 2px 0;
+            font-weight: normal;
         }
 
-        .content {
-            margin: 20px 0;
+        .title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
         }
 
-        .info-table {
-            width: 100%;
+        .barcode {
+            text-align: center;
             margin-bottom: 20px;
         }
 
-        .info-table td {
-            padding: 8px 0;
-            font-size: 14px;
+        .barcode img {
+            width: 90px;
+            height: 90px;
         }
 
-        .info-table td:first-child {
-            width: 200px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        td {
+            vertical-align: top;
+            padding: 4px;
+        }
+
+        .bordered th,
+        .bordered td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: left;
+        }
+
+        .bordered th {
+            background: #f5f5f5;
+        }
+
+        .section-header {
             font-weight: bold;
-        }
-
-        .qr-section {
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            border: 2px dashed #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            text-transform: uppercase;
+            font-size: 10px;
+            color: #555;
         }
 
         .footer {
-            margin-top: 40px;
-            font-size: 12px;
+            margin-top: 20px;
         }
 
-        .signature {
-            margin-top: 60px;
-            display: flex;
-            justify-content: space-between;
+        .signature-table {
+            width: 100%;
+            margin-top: 30px;
+            border: none;
         }
 
-        .signature div {
+        .signature-table td {
             text-align: center;
-            width: 45%;
+            vertical-align: top;
         }
 
-        .signature-line {
-            margin-top: 60px;
-            border-top: 1px solid #000;
-            padding-top: 5px;
+        .rules {
+            font-size: 9px;
+            color: #555;
+            margin-top: 10px;
+            border: 1px solid #eee;
+            padding: 10px;
+            background: #fcfcfc;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 12px;
+        .rules ol {
+            margin: 0;
+            padding-left: 15px;
         }
 
-        .status-approved {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-active {
-            background-color: #d1ecf1;
-            color: #0c5460;
+        .rules li {
+            margin-bottom: 2px;
         }
     </style>
 </head>
 
 <body>
     <div class="header">
-        <h1>BUKTI PEMINJAMAN</h1>
-        <p>Sistem Informasi Sarana Prasarana</p>
-        <p>SMKN 1 Boyolangu</p>
+        <h1>SIAPRAS SMKN 1 BOYOLANGU</h1>
+        <h2>Sistem Informasi Sarana dan Prasarana</h2>
     </div>
 
-    <div class="content">
-        <table class="info-table">
-            <tr>
-                <td>Nomor Peminjaman</td>
-                <td>: #{{ str_pad($peminjaman->id, 5, '0', STR_PAD_LEFT) }}</td>
-            </tr>
-            <tr>
-                <td>Tanggal Peminjaman</td>
-                <td>: {{ $peminjaman->tgl_pinjam->format('d F Y') }}</td>
-            </tr>
-            <tr>
-                <td>Status</td>
-                <td>: <span
-                        class="status-badge status-{{ $peminjaman->status }}">{{ strtoupper($peminjaman->status) }}</span>
-                </td>
-            </tr>
-        </table>
+    <div class="title">Bukti Peminjaman Barang</div>
 
-        <h3 style="margin-top: 30px; border-bottom: 2px solid #000; padding-bottom: 5px;">Data Peminjam</h3>
-        <table class="info-table">
-            <tr>
-                <td>Nama Lengkap</td>
-                <td>: {{ $peminjaman->user->nama_lengkap }}</td>
-            </tr>
-            <tr>
-                <td>Email</td>
-                <td>: {{ $peminjaman->user->email }}</td>
-            </tr>
-            <tr>
-                <td>Role</td>
-                <td>: {{ ucfirst($peminjaman->user->role) }}</td>
-            </tr>
-            @if($peminjaman->user->siswa)
-                <tr>
-                    <td>Kelas</td>
-                    <td>: {{ $peminjaman->user->siswa->kelas->nama_kelas ?? '-' }}</td>
-                </tr>
-            @endif
-        </table>
-
-        <h3 style="margin-top: 30px; border-bottom: 2px solid #000; padding-bottom: 5px;">Detail Barang</h3>
-        <table class="info-table">
-            <tr>
-                <td>Nama Barang</td>
-                <td>: {{ $peminjaman->barang->nama_barang }}</td>
-            </tr>
-            <tr>
-                <td>Kategori</td>
-                <td>: {{ $peminjaman->barang->kategori->nama ?? '-' }}</td>
-            </tr>
-            @if($peminjaman->barangUnit)
-                <tr>
-                    <td>Kode Unit</td>
-                    <td>: <strong>{{ $peminjaman->barangUnit->kode_unit }}</strong></td>
-                </tr>
-            @endif
-            <tr>
-                <td>Jumlah</td>
-                <td>: {{ $peminjaman->jumlah }} unit</td>
-            </tr>
-            <tr>
-                <td>Tujuan Peminjaman</td>
-                <td>: {{ $peminjaman->tujuan_pinjam }}</td>
-            </tr>
-        </table>
-
-        <h3 style="margin-top: 30px; border-bottom: 2px solid #000; padding-bottom: 5px;">Jadwal Pengembalian</h3>
-        <table class="info-table">
-            <tr>
-                <td>Tanggal Kembali (Rencana)</td>
-                <td>: {{ $peminjaman->tgl_kembali_rencana->format('d F Y') }}</td>
-            </tr>
-            @if($peminjaman->tgl_kembali_aktual)
-                <tr>
-                    <td>Tanggal Kembali (Aktual)</td>
-                    <td>: {{ $peminjaman->tgl_kembali_aktual->format('d F Y') }}</td>
-                </tr>
-            @endif
-        </table>
-
-        <div class="qr-section">
-            <p style="margin: 0 0 10px 0; font-weight: bold;">Scan QR Code untuk Verifikasi</p>
-            {!! QrCode::size(150)->generate(route('staff.peminjaman.index') . '?id=' . $peminjaman->id) !!}
-            <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">ID: {{ $peminjaman->id }}</p>
-        </div>
-
-        <div class="footer">
-            <p><strong>Catatan Penting:</strong></p>
-            <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
-                <li>Harap mengembalikan barang sesuai jadwal yang telah ditentukan</li>
-                <li>Barang yang dikembalikan harus dalam kondisi baik</li>
-                <li>Kerusakan atau kehilangan menjadi tanggung jawab peminjam</li>
-                <li>Simpan bukti ini sebagai tanda peminjaman yang sah</li>
-            </ul>
-        </div>
-
-        <div class="signature">
-            <div>
-                <p>Peminjam,</p>
-                <div class="signature-line">{{ $peminjaman->user->nama_lengkap }}</div>
-            </div>
-            <div>
-                <p>Petugas,</p>
-                <div class="signature-line">(...........................)</div>
-            </div>
-        </div>
+    <div class="barcode">
+        @if(isset($qrCodeImage) && $qrCodeImage)
+            <img src="{{ $qrCodeImage }}" alt="QR Code">
+        @else
+            <div
+                style="border:1px dashed #ccc; width:90px; height:90px; margin:0 auto; display:flex; align-items:center; justify-content:center; line-height:90px;">
+                No QR</div>
+        @endif
+        <div style="font-family: monospace; margin-top: 5px;">{{ $peminjaman->kode }}</div>
     </div>
 
-    <script>
-        window.onload = function () {
-            // Auto print when page loads (optional)
-            // window.print();
-        }
-    </script>
+    <div class="section-header">Informasi</div>
+    <table>
+        <tr>
+            <td width="20%">Nama Peminjam</td>
+            <td width="30%">: {{ $peminjaman->user->nama_lengkap ?? $peminjaman->user->username }}</td>
+            <td width="20%">Kode Unit</td>
+            <td width="30%">: <b>{{ $peminjaman->barangUnit->kode_unit ?? '-' }}</b></td>
+        </tr>
+        <tr>
+            <td>Jabatan</td>
+            <td>:
+                @if($peminjaman->user->role == 'siswa')
+                    Siswa {{ $peminjaman->user->siswa->kelas->nama_kelas ?? '' }}
+                @elseif($peminjaman->user->role == 'guru')
+                    Guru
+                @else
+                    {{ ucfirst($peminjaman->user->role) }}
+                @endif
+            </td>
+            <td>Kondisi Awal</td>
+            <td>: {{ ucfirst($peminjaman->barangUnit->kondisi ?? '-') }}</td>
+        </tr>
+    </table>
+
+    <div class="section-header">Detail Barang & Peminjaman</div>
+    <table class="bordered">
+        <thead>
+            <tr>
+                <th>Nama Barang</th>
+                <th>Kategori</th>
+                <th>Tgl Pinjam</th>
+                <th>Rencana Kembali</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ $peminjaman->barang->nama_barang }}</td>
+                <td>{{ $peminjaman->barang->kategori->nama_kategori ?? '-' }}</td>
+                <td>{{ $peminjaman->tgl_pinjam->format('d M Y') }}</td>
+                <td>{{ $peminjaman->tgl_kembali_rencana->format('d M Y') }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    @if($peminjaman->tujuan_pinjam)
+        <div class="section-header">Keperluan</div>
+        <div style="font-size: 10px; background: #f9f9f9; padding: 8px; border: 1px solid #eee; margin-bottom: 15px;">
+            {{ $peminjaman->tujuan_pinjam }}
+        </div>
+    @endif
+
+    <div class="rules">
+        <strong>Ketentuan Peminjaman:</strong>
+        <ol>
+            <li>Peminjam bertanggung jawab penuh atas barang yang dipinjam.</li>
+            <li>Barang harus dikembalikan tepat waktu sesuai dengan tanggal rencana kembali.</li>
+            <li>Segala kerusakan atau kehilangan barang menjadi tanggung jawab peminjam dan wajib mengganti atau
+                memperbaiki sesuai kebijakan sekolah.</li>
+            <li>Bukti ini wajib dibawa saat pengembalian barang.</li>
+            <li>Pihak Sarpras berhak menarik barang sewaktu-waktu jika diperlukan mendesak.</li>
+        </ol>
+    </div>
+
+
 </body>
 
 </html>

@@ -91,6 +91,10 @@ class PeminjamanController extends Controller
             $newPeminjaman->barang->decrement('jumlah_stok');
         }
 
+
+
+        \App\Helpers\ActivityLogger::log('Approve Peminjaman', 'Menyetujui peminjaman: ' . $peminjaman->kode . ' (' . count($unitIds) . ' unit)', $peminjaman);
+
         return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman disetujui. ' . count($request->barang_unit_ids) . ' unit telah dialokasikan.');
     }
 
@@ -114,6 +118,10 @@ class PeminjamanController extends Controller
             'keterangan_penolakan' => $request->keterangan_penolakan,
         ]);
 
+
+
+        \App\Helpers\ActivityLogger::log('Reject Peminjaman', 'Menolak peminjaman: ' . $peminjaman->kode, $peminjaman);
+
         return back()->with('success', 'Peminjaman ditolak.');
     }
 
@@ -134,6 +142,10 @@ class PeminjamanController extends Controller
 
         $peminjaman->update(['status' => 'active']);
 
+
+
+        \App\Helpers\ActivityLogger::log('Activate Peminjaman', 'Mengubah status menjadi Aktif (Barang Diambil): ' . $peminjaman->kode, $peminjaman);
+
         return back()->with('success', 'Status peminjaman diubah menjadi Aktif (Barang Diambil).');
     }
 
@@ -148,7 +160,24 @@ class PeminjamanController extends Controller
             return back()->with('error', 'Bukti peminjaman hanya untuk status Disetujui/Aktif.');
         }
 
-        return view('admin.peminjaman.bukti', compact('peminjaman'));
+        // Generate QR Content (URL to this PDF)
+        $url = route('admin.peminjaman.bukti', $id);
+
+        // Render QR as SVG Base64 (Avoids ImageMagick dependency)
+        $qrRaw = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(150)->generate($url);
+        $qrCodeImage = 'data:image/svg+xml;base64,' . base64_encode($qrRaw);
+
+        $pdf = Pdf::loadView('admin.peminjaman.bukti', compact('peminjaman', 'qrCodeImage'));
+        $pdf->setPaper('A4', 'portrait');
+
+        $pdf->render();
+        // Auto-print removed upon request
+        // $canvas = $pdf->getDomPDF()->getCanvas();
+        // if (method_exists($canvas, 'get_cpdf')) {
+        //     $canvas->get_cpdf()->addJavaScript('this.print({bUI: true, bSilent: false, bShrinkToFit: true});');
+        // }
+
+        return $pdf->stream('Bukti-Peminjaman-' . $peminjaman->kode . '.pdf');
     }
 
     /**
@@ -242,6 +271,13 @@ class PeminjamanController extends Controller
             }
         }
 
+        \App\Helpers\ActivityLogger::log('Pengembalian Barang', 'Menerima pengembalian: ' . $peminjaman->kode . ' Kondisi: ' . $request->kondisi, $peminjaman);
+
         return redirect()->route('admin.peminjaman.index')->with('success', 'Barang berhasil dikembalikan.');
+    }
+    public function redirectByKode($kode)
+    {
+        $peminjaman = Peminjaman::where('kode', $kode)->firstOrFail();
+        return redirect()->route('admin.peminjaman.bukti', $peminjaman->id);
     }
 }

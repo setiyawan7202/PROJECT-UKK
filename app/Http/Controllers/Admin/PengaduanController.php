@@ -53,6 +53,8 @@ class PengaduanController extends Controller
         $pengaduan = Pengaduan::findOrFail($id);
         $pengaduan->update(['status' => $request->status]);
 
+        \App\Helpers\ActivityLogger::log('Update Status Pengaduan', 'Mengubah status pengaduan ' . $pengaduan->kode . ' menjadi ' . $request->status, $pengaduan);
+
         return back()->with('success', 'Status pengaduan diperbarui.');
     }
 
@@ -72,6 +74,8 @@ class PengaduanController extends Controller
             'user_id' => Auth::id(),
             'catatan' => $request->catatan,
         ]);
+
+        \App\Helpers\ActivityLogger::log('Respon Admin Pengaduan', 'Admin menanggapi pengaduan: ' . $pengaduan->kode, $pengaduan);
 
         return back()->with('success', 'Tanggapan berhasil ditambahkan.');
     }

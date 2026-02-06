@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\DashboardController;
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('index');
+    Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart');
+    Route::get('/scan', [App\Http\Controllers\Admin\ScanController::class, 'index'])->name('scan.index');
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/trash', [UserController::class, 'trash'])->name('users.trash');
@@ -66,4 +68,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/laporan/pengaduan', [App\Http\Controllers\Admin\LaporanController::class, 'pengaduan'])->name('laporan.pengaduan');
     Route::get('/laporan/barang', [App\Http\Controllers\Admin\LaporanController::class, 'barang'])->name('laporan.barang');
 
+    Route::get('/{kode}', [App\Http\Controllers\Admin\PeminjamanController::class, 'redirectByKode'])
+        ->where('kode', 'PMJ-[0-9]+')
+        ->name('redirectByKode');
 });

@@ -62,6 +62,12 @@
                     class="px-4 py-2 rounded-lg text-sm font-medium transition {{ !$filter && !$statusFilter && !$kelasFilter ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
                     Semua
                 </a>
+                @if(Auth::user()->role === 'superadmin')
+                    <a href="{{ route('admin.users.index', ['filter' => 'superadmin', 'search' => $search ?? '']) }}"
+                        class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $filter === 'superadmin' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-600 hover:bg-purple-100' }}">
+                        Super Admin
+                    </a>
+                @endif
                 <a href="{{ route('admin.users.index', ['filter' => 'admin', 'search' => $search ?? '']) }}"
                     class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $filter === 'admin' ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
                     Admin
@@ -157,22 +163,22 @@
                                 <span class="text-sm text-gray-600 whitespace-nowrap">{{ $user->email }}</span>
                             </td>
                             <td class="px-4 lg:px-6 py-4">
-                                <span
-                                    class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
-                                                                                                                                                        @if($user->role === 'admin') bg-black text-white
-                                                                                                                                                        @elseif($user->role === 'petugas') bg-gray-700 text-white
-                                                                                                                                                        @else bg-gray-100 text-gray-700
-                                                                                                                                                        @endif">
-                                    {{ ucfirst($user->role) }}
+                                <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
+                                                                @if($user->role === 'superadmin') bg-purple-600 text-white
+                                                                @elseif($user->role === 'admin') bg-black text-white
+                                                                @elseif($user->role === 'petugas') bg-gray-700 text-white
+                                                                @else bg-gray-100 text-gray-700
+                                                                @endif">
+                                    {{ $user->role === 'superadmin' ? 'Super Admin' : ucfirst($user->role) }}
                                 </span>
                             </td>
                             <td class="px-4 lg:px-6 py-4">
                                 @if($user->status)
                                     <span
                                         class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
-                                                                                                                                                                                        @if($user->status === 'siswa') bg-blue-100 text-blue-700
-                                                                                                                                                                                        @else bg-green-100 text-green-700
-                                                                                                                                                                                        @endif">
+                                                                                                                                                                                                                            @if($user->status === 'siswa') bg-blue-100 text-blue-700
+                                                                                                                                                                                                                            @else bg-green-100 text-green-700
+                                                                                                                                                                                                                            @endif">
                                         {{ ucfirst($user->status) }}
                                     </span>
                                 @else
@@ -197,14 +203,16 @@
                             </td>
                             <td class="px-4 lg:px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('admin.users.edit', $user->id) }}"
-                                        class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                    </a>
-                                    @if($user->id !== auth()->id())
+                                    @if($user->id === auth()->id() || Auth::user()->role === 'superadmin' || !in_array($user->role, ['superadmin', 'admin']))
+                                        <a href="{{ route('admin.users.edit', $user->id) }}"
+                                            class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </a>
+                                    @endif
+                                    @if($user->id !== auth()->id() && (Auth::user()->role === 'superadmin' || !in_array($user->role, ['superadmin', 'admin'])))
                                         <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}"
                                             onsubmit="return confirm('Yakin ingin menghapus user ini?')">
                                             @csrf

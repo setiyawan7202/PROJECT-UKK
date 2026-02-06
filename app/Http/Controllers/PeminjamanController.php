@@ -40,23 +40,40 @@ class PeminjamanController extends Controller
             return back()->with('error', 'Bukti peminjaman hanya tersedia untuk status Disetujui, Aktif, atau Selesai.');
         }
 
-        // Generate QR Code as Base64 to ensure it appears in PDF
-        $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($peminjaman->kode);
-        $qrImage = null;
-
-        try {
-            $qrContent = file_get_contents($qrUrl);
-            if ($qrContent) {
-                $qrImage = 'data:image/png;base64,' . base64_encode($qrContent);
-            }
-        } catch (\Exception $e) {
-            // Check internet connection or fallback
-        }
+        // Generate QR Code as SVG Base64 (Reliable, no Imagick needed)
+        // Note: Using 'qrImage' variable name to match pdf.peminjaman-bukti view
+        $url = route('staff.redirectByKode', $peminjaman->kode); // Use redirection route with correct prefix
+        $qrRaw = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(100)->generate($url);
+        $qrImage = 'data:image/svg+xml;base64,' . base64_encode($qrRaw);
 
         $pdf = Pdf::loadView('pdf.peminjaman-bukti', compact('peminjaman', 'qrImage'));
         $pdf->setPaper('A4', 'portrait');
 
         return $pdf->download('Bukti-Peminjaman-' . $peminjaman->kode . '.pdf');
+    }
+
+    public function cetakBukti($id)
+    {
+        $peminjaman = Peminjaman::where('user_id', Auth::id())
+            ->with(['barang.kategori', 'barangUnit', 'user.siswa.kelas', 'user.guru'])
+            ->findOrFail($id);
+
+        if (!in_array($peminjaman->status, ['approved', 'active', 'completed'])) {
+            return back()->with('error', 'Bukti peminjaman hanya tersedia untuk status Disetujui, Aktif, atau Selesai.');
+        }
+
+        // Generate QR Code as SVG
+        $url = route('staff.redirectByKode', $peminjaman->kode);
+        $qrRaw = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(100)->generate($url);
+        $qrImage = 'data:image/svg+xml;base64,' . base64_encode($qrRaw);
+
+        $pdf = Pdf::loadView('pdf.peminjaman-bukti', compact('peminjaman', 'qrImage'));
+        $pdf->setPaper('A4', 'portrait');
+
+        // Inject Auto-Print JavaScript
+        $pdf->render();
+
+        return $pdf->stream('Bukti-Peminjaman-' . $peminjaman->kode . '.pdf');
     }
 
     public function create(Request $request)
@@ -185,7 +202,7 @@ class PeminjamanController extends Controller
             }
         }
 
-        Peminjaman::create([
+        $peminjaman = Peminjaman::create([
             'kode' => Peminjaman::generateKode(),
             'user_id' => Auth::id(),
             'barang_id' => $request->barang_id,
@@ -196,6 +213,8 @@ class PeminjamanController extends Controller
             'tujuan_pinjam' => $request->tujuan_pinjam,
             'status' => 'pending',
         ]);
+
+        \App\Helpers\ActivityLogger::log('Peminjaman', 'Mengajukan peminjaman barang: ' . $barang->nama_barang, $peminjaman);
 
         return redirect()->route('peminjaman.index')->with('success', 'Pengajuan peminjaman berhasil dikirim. Menunggu persetujuan.');
     }
@@ -208,6 +227,8 @@ class PeminjamanController extends Controller
         }
 
         $peminjaman->delete();
+
+        \App\Helpers\ActivityLogger::log('Batal Peminjaman', 'Membatalkan pengajuan peminjaman: ' . $peminjaman->kode, $peminjaman);
 
         return redirect()->route('peminjaman.index')->with('success', 'Pengajuan peminjaman berhasil dibatalkan.');
     }

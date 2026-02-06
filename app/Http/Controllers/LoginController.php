@@ -37,7 +37,7 @@ class LoginController extends Controller
         AuthFacade::login($user);
         $request->session()->regenerate();
 
-        if ($user->role === 'admin') {
+        if ($user->role === 'admin' || $user->role === 'superadmin') {
             return redirect()->intended('/admin');
         }
 
@@ -45,11 +45,14 @@ class LoginController extends Controller
             return redirect()->intended('/staff');
         }
 
+        \App\Helpers\ActivityLogger::log('Login', 'User Login: ' . $user->email);
+
         return redirect()->intended('/main');
     }
 
     public function logout(Request $request)
     {
+        \App\Helpers\ActivityLogger::log('Logout', 'User Logout');
         AuthFacade::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

@@ -26,7 +26,9 @@ class UserController extends Controller
 
         $query = Auth::with('siswa.kelas');
 
-        if ($filter === 'admin') {
+        if ($filter === 'superadmin') {
+            $query->where('role', 'superadmin');
+        } elseif ($filter === 'admin') {
             $query->where('role', 'admin');
         } elseif ($filter === 'petugas') {
             $query->where('role', 'petugas');
@@ -67,10 +69,20 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        $currentUserRole = auth()->user()->role;
+
+        // Determine allowed roles based on current user's role
+        if ($currentUserRole === 'superadmin') {
+            $allowedRoles = 'required|in:superadmin,admin,petugas,pengguna';
+        } else {
+            // Admin can only create petugas and pengguna
+            $allowedRoles = 'required|in:petugas,pengguna';
+        }
+
         $request->validate([
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:admin,petugas,pengguna',
+            'role' => $allowedRoles,
             'nama_lengkap' => 'required|string|max:255',
             'status' => 'nullable|in:siswa,guru',
             // Siswa validation
@@ -79,6 +91,8 @@ class UserController extends Controller
             // Guru validation
             'nip' => 'nullable|required_if:status,guru|unique:guru,nip|numeric',
             'no_hp' => 'nullable|string|max:15',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'string',
         ]);
 
         DB::beginTransaction();
@@ -91,11 +105,13 @@ class UserController extends Controller
             }
 
             $user = Auth::create([
+                'username' => $request->nama_lengkap, // Save nama_lengkap to username column
                 'email' => $request->email,
                 'data_nip_nisn' => $username,
                 'password' => Hash::make($request->password),
                 'role' => $request->role,
                 'status' => $request->status,
+                'permissions' => $request->role === 'petugas' ? $request->permissions : null,
             ]);
 
             // Create related records
@@ -139,6 +155,18 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = Auth::findOrFail($id);
+
+        if ($user->id === auth()->id()) {
+            // Allow user to edit their own profile (or redirect to profile edit if separate)
+            // For now, let's allow it, but role changing is disabled in view for non-superadmin
+        } else {
+            // Restriction: Admin cannot edit superadmin or other admins
+            $currentUserRole = auth()->user()->role;
+            if ($currentUserRole !== 'superadmin' && in_array($user->role, ['superadmin', 'admin'])) {
+                return back()->withErrors(['error' => 'Hanya Super Admin yang dapat mengubah akun Admin atau Super Admin!']);
+            }
+        }
+
         $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
 
         return view('admin.users.edit', compact('user', 'kelasList'));
@@ -148,21 +176,41 @@ class UserController extends Controller
     {
         $user = Auth::findOrFail($id);
 
-        $request->validate([
+        // Restriction: Admin cannot edit superadmin or other admins
+        $currentUserRole = auth()->user()->role;
+        if ($currentUserRole !== 'superadmin' && in_array($user->role, ['superadmin', 'admin'])) {
+            return back()->withErrors(['error' => 'Hanya Super Admin yang dapat mengubah akun Admin atau Super Admin!']);
+        }
+
+        // Validate password only if it is filled
+        $passwordRule = $request->filled('password') ? 'string|min:8' : 'nullable';
+
+        $rules = [
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => 'nullable|string|min:8',
-            'role' => 'required|in:admin,petugas,pengguna',
+            'password' => $passwordRule,
+            'role' => 'required|in:superadmin,admin,petugas,pengguna',
             'nama_lengkap' => 'required|string|max:255',
             'status' => 'nullable|in:siswa,guru',
             'kelas_id' => 'nullable|required_if:status,siswa|exists:kelas,id',
             'no_hp' => 'nullable|string|max:15',
-        ]);
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'string',
+        ];
+
+        // If user is not superadmin, they cannot set role to superadmin/admin
+        if ($currentUserRole !== 'superadmin') {
+            $rules['role'] = 'required|in:petugas,pengguna';
+        }
+
+        $request->validate($rules);
 
         try {
             $userData = [
+                'username' => $request->nama_lengkap,
                 'email' => $request->email,
                 'role' => $request->role,
                 'status' => $request->status,
+                'permissions' => $request->role === 'petugas' ? $request->permissions : null,
             ];
 
             // Update Username (Nama Lengkap) in Child Tables
@@ -214,6 +262,12 @@ class UserController extends Controller
 
         if ($user->id === auth()->id()) {
             return back()->withErrors(['error' => 'Tidak dapat menghapus akun sendiri!']);
+        }
+
+        // Admin cannot delete superadmin or admin users
+        $currentUserRole = auth()->user()->role;
+        if ($currentUserRole !== 'superadmin' && in_array($user->role, ['superadmin', 'admin'])) {
+            return back()->withErrors(['error' => 'Hanya Super Admin yang dapat menghapus akun Admin atau Super Admin!']);
         }
 
         $user->delete();

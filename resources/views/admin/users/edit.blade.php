@@ -69,11 +69,19 @@
                 <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Role <span
                         class="text-red-500">*</span></label>
                 <select id="role" name="role" required
-                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition bg-white">
-                    <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Admin</option>
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition bg-white"
+                    @if(Auth::user()->role !== 'superadmin' && in_array($user->role, ['superadmin', 'admin'])) disabled @endif>
+                    @if(Auth::user()->role === 'superadmin')
+                        <option value="superadmin" {{ old('role', $user->role) === 'superadmin' ? 'selected' : '' }}>Super Admin</option>
+                        <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Admin</option>
+                    @endif
                     <option value="petugas" {{ old('role', $user->role) === 'petugas' ? 'selected' : '' }}>Petugas</option>
                     <option value="pengguna" {{ old('role', $user->role) === 'pengguna' ? 'selected' : '' }}>Pengguna</option>
                 </select>
+                @if(Auth::user()->role !== 'superadmin' && in_array($user->role, ['superadmin', 'admin']))
+                    <input type="hidden" name="role" value="{{ $user->role }}">
+                    <p class="mt-1 text-xs text-amber-600">Hanya Super Admin yang dapat mengubah role ini.</p>
+                @endif
             </div>
 
             <!-- Status -->
@@ -138,6 +146,44 @@
                 </select>
             </div>
 
+            <!-- Permissions (Only for Petugas) -->
+            <div class="mb-5" id="permissions-field" style="{{ old('role', $user->role) === 'petugas' ? '' : 'display: none;' }}">
+                <label class="block text-sm font-medium text-gray-700 mb-3">Hak Akses Petugas</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" name="permissions[]" value="manage_barang" 
+                            class="w-5 h-5 text-black rounded border-gray-300 focus:ring-black transition"
+                            {{ in_array('manage_barang', $user->permissions ?? []) ? 'checked' : '' }}>
+                        <span class="text-sm text-gray-700">Kelola Barang</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" name="permissions[]" value="manage_kategori" 
+                            class="w-5 h-5 text-black rounded border-gray-300 focus:ring-black transition"
+                            {{ in_array('manage_kategori', $user->permissions ?? []) ? 'checked' : '' }}>
+                        <span class="text-sm text-gray-700">Kelola Kategori</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" name="permissions[]" value="manage_ruangan" 
+                            class="w-5 h-5 text-black rounded border-gray-300 focus:ring-black transition"
+                            {{ in_array('manage_ruangan', $user->permissions ?? []) ? 'checked' : '' }}>
+                        <span class="text-sm text-gray-700">Kelola Ruangan</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" name="permissions[]" value="manage_users" 
+                            class="w-5 h-5 text-black rounded border-gray-300 focus:ring-black transition"
+                            {{ in_array('manage_users', $user->permissions ?? []) ? 'checked' : '' }}>
+                        <span class="text-sm text-gray-700">Kelola User (Siswa/Guru)</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" name="permissions[]" value="manage_kelas" 
+                            class="w-5 h-5 text-black rounded border-gray-300 focus:ring-black transition"
+                            {{ in_array('manage_kelas', $user->permissions ?? []) ? 'checked' : '' }}>
+                        <span class="text-sm text-gray-700">Kelola Kelas</span>
+                    </label>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Centang fitur yang ingin diberikan akses edit/hapus kepada petugas.</p>
+            </div>
+
             <!-- Submit -->
             <div class="flex flex-col sm:flex-row gap-3">
                 <button type="submit"
@@ -154,12 +200,25 @@
 @endsection
 
 @push('scripts')
-    <script>     function togglePasswordVisibility(id) {
-            const input = document.getElementById(id); const eyeIcon = document.getElementById('eye-icon-' + id); const eyeOffIcon = document.getElementById('eye-off-icon-' + id);
-            if (input.type === 'password') { input.type = 'text'; eyeIcon.classList.add('hidden'); eyeOffIcon.classList.remove('hidden'); } else { input.type = 'password'; eyeIcon.classList.remove('hidden'); eyeOffIcon.classList.add('hidden'); }
+    <script>
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            const eyeIcon = document.getElementById('eye-icon-' + id);
+            const eyeOffIcon = document.getElementById('eye-off-icon-' + id);
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.classList.add('hidden');
+                eyeOffIcon.classList.remove('hidden');
+            } else {
+                input.type = 'password';
+                eyeIcon.classList.remove('hidden');
+                eyeOffIcon.classList.add('hidden');
+            }
         }
+
         function toggleKelasField() {
-            const status = document.getElementById('status').value; const kelasField = document.getElementById('kelas-field');
+            const status = document.getElementById('status').value;
+            const kelasField = document.getElementById('kelas-field');
             if (status === 'siswa') {
                 kelasField.style.display = 'block';
                 document.getElementById('nisn-field').style.display = 'block';
@@ -179,5 +238,16 @@
                 document.getElementById('no_hp-field').style.display = 'none';
             }
         }
+
+        // Toggle Permissions Field
+        document.getElementById('role').addEventListener('change', function() {
+            const role = this.value;
+            const permField = document.getElementById('permissions-field');
+            if(role === 'petugas') {
+                permField.style.display = 'block';
+            } else {
+                permField.style.display = 'none';
+            }
+        });
     </script>
 @endpush

@@ -26,9 +26,17 @@ class BarangController extends Controller
             })
             ->when($request->filled('kategori_id'), fn($q) => $q->where('kategori_id', $request->kategori_id))
             ->when($request->filled('ruangan_id'), fn($q) => $q->where('ruangan_id', $request->ruangan_id))
-            ->when($request->filled('jenis_aset'), fn($q) => $q->where('jenis_aset', $request->jenis_aset))
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->when($request->filled('jenis_aset'), fn($q) => $q->where('jenis_aset', $request->jenis_aset));
+
+        // RBAC: Kepala Lab only sees assets in their room
+        if (auth()->user()->role === 'kepala_lab') {
+            $barangs->whereHas('ruangan', function ($q) {
+                $q->where('kepala1_id', auth()->id())
+                    ->orWhere('kepala2_id', auth()->id());
+            });
+        }
+
+        $barangs = $barangs->orderBy('created_at', 'desc')->get();
 
         $kategoris = Kategori::all();
         $ruangans = Ruangan::all();

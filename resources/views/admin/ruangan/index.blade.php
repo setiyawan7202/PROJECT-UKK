@@ -35,20 +35,31 @@
 
     <div class="bg-white border border-gray-100 rounded-xl overflow-hidden">
         <div class="p-4 border-b border-gray-100">
-            <form action="{{ route('admin.ruangan.index') }}" method="GET" class="flex gap-2">
+            <form id="searchForm" action="{{ route('admin.ruangan.index') }}" method="GET" class="flex gap-2">
                 <div class="relative flex-1">
                     <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari ruangan..."
+                    <input type="text" id="searchInput" name="search" value="{{ request('search') }}"
+                        placeholder="Cari ruangan..."
                         class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-black">
                 </div>
-                <button type="submit"
-                    class="bg-gray-100 px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-200 transition">Cari</button>
             </form>
         </div>
+
+        @push('scripts')
+            <script>
+                let searchTimeout;
+                document.getElementById('searchInput')?.addEventListener('input', function () {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        document.getElementById('searchForm').submit();
+                    }, 500);
+                });
+            </script>
+        @endpush
 
         <div class="overflow-x-auto w-full">
             <table class="w-full min-w-[800px] text-left text-sm whitespace-nowrap">
@@ -57,7 +68,7 @@
                         <th class="px-6 py-3 font-semibold text-xs uppercase">Kode</th>
                         <th class="px-6 py-3 font-semibold text-xs uppercase">Nama Ruangan</th>
                         <th class="px-6 py-3 font-semibold text-xs uppercase">Lokasi</th>
-                        <th class="px-6 py-3 font-semibold text-xs uppercase">Keterangan</th>
+                        <th class="px-6 py-3 font-semibold text-xs uppercase">Kepala Lab</th>
                         <th class="px-6 py-3 font-semibold text-xs uppercase text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -67,7 +78,26 @@
                             <td class="px-6 py-4 font-medium text-gray-900">{{ $ruangan->kode_ruangan }}</td>
                             <td class="px-6 py-4 text-gray-600">{{ $ruangan->nama_ruangan }}</td>
                             <td class="px-6 py-4 text-gray-600">{{ $ruangan->lokasi }}</td>
-                            <td class="px-6 py-4 text-gray-500 truncate max-w-xs">{{ $ruangan->keterangan ?? '-' }}</td>
+                            <td class="px-6 py-4 text-gray-600">
+                                @if($ruangan->kepala1 || $ruangan->kepala2)
+                                    <div class="flex flex-col gap-1">
+                                        @if($ruangan->kepala1)
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-lg">
+                                                {{ $ruangan->kepala1->username }}
+                                            </span>
+                                        @endif
+                                        @if($ruangan->kepala2)
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 text-xs rounded-lg">
+                                                {{ $ruangan->kepala2->username }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                @else
+                                    <span class="text-gray-400">-</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.ruangan.edit', $ruangan->id) }}"

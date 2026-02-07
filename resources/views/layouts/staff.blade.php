@@ -148,28 +148,43 @@
                     Dashboard
                 </a>
 
-                <p class="px-3 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase">Data Master</p>
+                <!-- Data Master Dropdown -->
+                <div class="sidebar-dropdown">
+                    <button onclick="toggleDropdown('dataMasterMenu')"
+                        class="w-full flex items-center justify-between px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base text-gray-600 hover:bg-gray-50 transition {{ request()->routeIs('staff.kategori.*') || request()->routeIs('staff.ruangan.*') ? 'bg-gray-100' : '' }}">
+                        <span class="flex items-center gap-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                            </svg>
+                            Data Master
+                        </span>
+                        <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="dataMasterMenu"
+                        class="pl-6 space-y-1 mt-1 {{ request()->routeIs('staff.kategori.*') || request()->routeIs('staff.ruangan.*') ? '' : 'hidden' }}">
+                        <a href="{{ route('staff.kategori.index') }}"
+                            class="sidebar-link {{ request()->routeIs('staff.kategori.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 py-2 rounded-lg text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                            Kategori
+                        </a>
+                        <a href="{{ route('staff.ruangan.index') }}"
+                            class="sidebar-link {{ request()->routeIs('staff.ruangan.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 py-2 rounded-lg text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            Ruangan
+                        </a>
+                    </div>
+                </div>
 
-                <a href="{{ route('staff.kategori.index') }}"
-                    class="sidebar-link {{ request()->routeIs('staff.kategori.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                    Kategori
-                </a>
-
-                <a href="{{ route('staff.ruangan.index') }}"
-                    class="sidebar-link {{ request()->routeIs('staff.ruangan.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    Ruangan
-                </a>
-
-                <p class="px-3 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase">Inventaris</p>
-
+                <!-- Inventaris (Single item for Staff) -->
                 <a href="{{ route('staff.barang.index') }}"
                     class="sidebar-link {{ request()->routeIs('staff.barang.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,39 +194,53 @@
                     Data Aset
                 </a>
 
-                <p class="px-3 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase">Peminjaman</p>
+                <!-- Peminjaman Dropdown -->
+                <div class="sidebar-dropdown">
+                    <button onclick="toggleDropdown('peminjamanMenu')"
+                        class="w-full flex items-center justify-between px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base text-gray-600 hover:bg-gray-50 transition {{ request()->routeIs('staff.peminjaman.*') || request()->routeIs('staff.scan.*') ? 'bg-gray-100' : '' }}">
+                        <span class="flex items-center gap-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            Peminjaman
+                        </span>
+                        <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="peminjamanMenu"
+                        class="pl-6 space-y-1 mt-1 {{ request()->routeIs('staff.peminjaman.*') || request()->routeIs('staff.scan.*') ? '' : 'hidden' }}">
+                        <a href="{{ route('staff.scan.index') }}"
+                            class="sidebar-link {{ request()->routeIs('staff.scan.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 py-2 rounded-lg text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                            </svg>
+                            Scan QR Code
+                        </a>
+                        <a href="{{ route('staff.peminjaman.index') }}"
+                            class="sidebar-link {{ request()->routeIs('staff.peminjaman.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 py-2 rounded-lg text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            Daftar Peminjaman
+                        </a>
+                    </div>
+                </div>
 
-                <a href="{{ route('staff.scan.index') }}"
-                    class="sidebar-link {{ request()->routeIs('staff.scan.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                    </svg>
-                    Scan QR Code
-                </a>
-
-                <a href="{{ route('staff.peminjaman.index') }}"
-                    class="sidebar-link {{ request()->routeIs('staff.peminjaman.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    Daftar Peminjaman
-                </a>
-
-                <p class="px-3 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase">Pengaduan</p>
-
+                <!-- Pengaduan (Single item) -->
                 <a href="{{ route('staff.pengaduan.index') }}"
                     class="sidebar-link {{ request()->routeIs('staff.pengaduan.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
-                    Daftar Pengaduan
+                    Pengaduan
                 </a>
 
-                <p class="px-3 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase">User</p>
-
+                <!-- User (Single item) -->
                 <a href="{{ route('staff.users.index') }}"
                     class="sidebar-link {{ request()->routeIs('staff.users.*') ? 'active' : 'text-gray-600' }} flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium text-sm lg:text-base">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -270,6 +299,14 @@
                 document.body.style.overflow = '';
             });
         });
+
+        // Sidebar dropdown toggle function
+        function toggleDropdown(menuId) {
+            const menu = document.getElementById(menuId);
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
     </script>
 
     @stack('scripts')

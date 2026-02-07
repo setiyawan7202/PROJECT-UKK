@@ -14,8 +14,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart');
     Route::get('/scan', [App\Http\Controllers\Admin\ScanController::class, 'index'])->name('scan.index');
+    Route::get('/scan/{kode}', [App\Http\Controllers\Admin\ScanController::class, 'index'])->name('scan.view');
+    Route::get('/scan/return/{kode}', [App\Http\Controllers\Admin\ScanController::class, 'scanReturn'])->name('scan.return');
+
+    // Activity Log
+    Route::get('/activity', [App\Http\Controllers\Admin\ActivityController::class, 'index'])->name('activity.index');
+    Route::get('/activity/export-pdf', [App\Http\Controllers\Admin\ActivityController::class, 'exportPdf'])->name('activity.exportPdf');
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users/import', [UserController::class, 'import'])->name('users.import');
+    Route::get('/users/template', [UserController::class, 'downloadTemplate'])->name('users.template');
     Route::get('/users/trash', [UserController::class, 'trash'])->name('users.trash');
     Route::put('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
     Route::delete('/users/{id}/force', [UserController::class, 'forceDelete'])->name('users.force_delete');
@@ -50,6 +58,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/peminjaman/{id}/approve', [App\Http\Controllers\Admin\PeminjamanController::class, 'approve'])->name('peminjaman.approve');
     Route::post('/peminjaman/{id}/reject', [App\Http\Controllers\Admin\PeminjamanController::class, 'reject'])->name('peminjaman.reject');
 
+    // Bulk Actions
+    Route::post('/peminjaman/{kode}/approve-bulk', [App\Http\Controllers\Admin\PeminjamanController::class, 'approveBulk'])->name('peminjaman.approveBulk');
+    Route::post('/peminjaman/{kode}/activate-bulk', [App\Http\Controllers\Admin\PeminjamanController::class, 'activateBulk'])->name('peminjaman.activateBulk');
+
     Route::middleware(['block.weekend'])->group(function () {
         Route::post('/peminjaman/{id}/activate', [App\Http\Controllers\Admin\PeminjamanController::class, 'activate'])->name('peminjaman.activate');
         Route::get('/peminjaman/{id}/return', [App\Http\Controllers\Admin\PeminjamanController::class, 'returnForm'])->name('peminjaman.return');
@@ -64,9 +76,31 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/pengaduan/{id}/response', [App\Http\Controllers\Admin\PengaduanController::class, 'storeResponse'])->name('pengaduan.response');
 
     Route::get('/laporan', [App\Http\Controllers\Admin\LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/asset-health', [App\Http\Controllers\Admin\LaporanController::class, 'assetHealth'])->name('laporan.assetHealth');
     Route::post('/laporan/peminjaman', [App\Http\Controllers\Admin\LaporanController::class, 'peminjaman'])->name('laporan.peminjaman');
     Route::post('/laporan/pengaduan', [App\Http\Controllers\Admin\LaporanController::class, 'pengaduan'])->name('laporan.pengaduan');
     Route::get('/laporan/barang', [App\Http\Controllers\Admin\LaporanController::class, 'barang'])->name('laporan.barang');
+
+    // Checklist Templates
+    Route::resource('checklist-templates', App\Http\Controllers\Admin\ChecklistTemplateController::class);
+    Route::get('/checklist-templates/kategori/{kategori}', [App\Http\Controllers\Admin\ChecklistTemplateController::class, 'getByKategori'])->name('checklist-templates.by-kategori');
+
+    // Maintenance
+    Route::get('/maintenance', [App\Http\Controllers\Admin\MaintenanceController::class, 'index'])->name('maintenance.index');
+    Route::get('/maintenance/create', [App\Http\Controllers\Admin\MaintenanceController::class, 'create'])->name('maintenance.create');
+    Route::post('/maintenance', [App\Http\Controllers\Admin\MaintenanceController::class, 'store'])->name('maintenance.store');
+    Route::get('/maintenance/{maintenance}/edit', [App\Http\Controllers\Admin\MaintenanceController::class, 'edit'])->name('maintenance.edit');
+    Route::put('/maintenance/{maintenance}', [App\Http\Controllers\Admin\MaintenanceController::class, 'update'])->name('maintenance.update');
+    Route::delete('/maintenance/{maintenance}', [App\Http\Controllers\Admin\MaintenanceController::class, 'destroy'])->name('maintenance.destroy');
+    Route::get('/maintenance/logs', [App\Http\Controllers\Admin\MaintenanceController::class, 'logs'])->name('maintenance.logs');
+    Route::get('/maintenance/logs/create', [App\Http\Controllers\Admin\MaintenanceController::class, 'createLog'])->name('maintenance.logs.create');
+    Route::post('/maintenance/logs', [App\Http\Controllers\Admin\MaintenanceController::class, 'storeLog'])->name('maintenance.logs.store');
+    Route::get('/maintenance/analytics', [App\Http\Controllers\Admin\MaintenanceController::class, 'analytics'])->name('maintenance.analytics');
+    Route::get('/maintenance/unit/{unit}/history', [App\Http\Controllers\Admin\MaintenanceController::class, 'getUnitHistory'])->name('maintenance.unit.history');
+
+    // Inspection (Pre-borrow & Post-return)
+    Route::get('/peminjaman/{id}/inspect', [App\Http\Controllers\Admin\PeminjamanController::class, 'inspectForm'])->name('peminjaman.inspect');
+    Route::post('/peminjaman/{id}/inspect', [App\Http\Controllers\Admin\PeminjamanController::class, 'storeInspection'])->name('peminjaman.storeInspection');
 
     Route::get('/{kode}', [App\Http\Controllers\Admin\PeminjamanController::class, 'redirectByKode'])
         ->where('kode', 'PMJ-[0-9]+')

@@ -19,15 +19,17 @@ class UserRegistered extends Mailable
     public $user;
     public $password;
     public $name;
+    public $isUpdate;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($user, $password, $name)
+    public function __construct($user, $password, $name, $isUpdate = false)
     {
         $this->user = $user;
         $this->password = $password;
         $this->name = $name;
+        $this->isUpdate = $isUpdate;
     }
 
     /**
@@ -36,7 +38,7 @@ class UserRegistered extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Selamat Datang di SIAPRAS',
+            subject: $this->isUpdate ? 'Update Informasi Akun SIAPRAS' : 'Selamat Datang di SIAPRAS',
         );
     }
 

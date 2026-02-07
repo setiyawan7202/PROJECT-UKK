@@ -33,21 +33,37 @@
             class="bg-white rounded-xl lg:rounded-2xl border border-gray-100 p-6">
             @csrf
 
-            <!-- Email -->
-            <div class="mb-5">
+            <!-- Mode Aktivasi -->
+            <div class="mb-5 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="text-sm font-medium text-gray-900">Aktifkan Langsung</label>
+                        <p class="text-xs text-gray-500 mt-0.5">Jika tidak aktif, user harus aktivasi sendiri melalui halaman Aktivasi</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="activate_now" id="activate_now" value="1" 
+                            class="sr-only peer" {{ old('activate_now', '1') == '1' ? 'checked' : '' }}
+                            onchange="toggleActivationFields()">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Email (only shown when activate_now is checked) -->
+            <div class="mb-5" id="email-field">
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email <span
                         class="text-red-500">*</span></label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                <input type="email" id="email" name="email" value="{{ old('email') }}"
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
                     placeholder="Masukkan email">
             </div>
 
-            <!-- Password -->
-            <div class="mb-5">
+            <!-- Password (only shown when activate_now is checked) -->
+            <div class="mb-5" id="password-field">
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password <span
                         class="text-red-500">*</span></label>
                 <div class="relative">
-                    <input type="password" id="password" name="password" required
+                    <input type="password" id="password" name="password"
                         class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition pr-32"
                         placeholder="Minimal 8 karakter" minlength="8">
                     <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
@@ -95,6 +111,7 @@
                         <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                     @endif
                     <option value="petugas" {{ old('role') === 'petugas' ? 'selected' : '' }}>Petugas</option>
+                    <option value="kepala_lab" {{ old('role') === 'kepala_lab' ? 'selected' : '' }}>Kepala Lab</option>
                     <option value="pengguna" {{ old('role') === 'pengguna' ? 'selected' : '' }}>Pengguna</option>
                 </select>
             </div>
@@ -280,8 +297,33 @@
             }
         });
 
+        // Toggle Activation Fields (Email & Password)
+        function toggleActivationFields() {
+            const activateNow = document.getElementById('activate_now').checked;
+            const emailField = document.getElementById('email-field');
+            const passwordField = document.getElementById('password-field');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+
+            if (activateNow) {
+                emailField.style.display = 'block';
+                passwordField.style.display = 'block';
+                emailInput.required = true;
+                passwordInput.required = true;
+            } else {
+                emailField.style.display = 'none';
+                passwordField.style.display = 'none';
+                emailInput.required = false;
+                passwordInput.required = false;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
-            generatePassword();
+            toggleActivationFields();
+            const activateNow = document.getElementById('activate_now').checked;
+            if (activateNow) {
+                generatePassword();
+            }
         });
     </script>
 @endpush

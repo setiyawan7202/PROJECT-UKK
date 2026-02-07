@@ -17,10 +17,20 @@
 
             <!-- Content -->
             <div style="padding: 40px;">
-                <h2 style="color: #111827; margin-top: 0; font-size: 20px;">Selamat Datang, {{ $name }}!</h2>
+                <h2 style="color: #111827; margin-top: 0; font-size: 20px;">
+                    @if($isUpdate)
+                        Halo, {{ $name }}!
+                    @else
+                        Selamat Datang, {{ $name }}!
+                    @endif
+                </h2>
                 <p style="color: #4b5563; line-height: 1.6; margin-bottom: 24px;">
-                    Akun Anda telah berhasil dibuat. Anda sekarang dapat mengakses sistem inventaris sarana dan
-                    prasarana sekolah.
+                    @if($isUpdate)
+                        Informasi akun Anda di sistem inventaris sarana dan prasarana sekolah telah diperbarui.
+                    @else
+                        Akun Anda telah berhasil dibuat. Anda sekarang dapat mengakses sistem inventaris sarana dan
+                        prasarana sekolah.
+                    @endif
                 </p>
 
                 <div
@@ -61,7 +71,7 @@
                             <tr>
                                 <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Kelas</td>
                                 <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600;">
-                                    {{ $user->siswa->kelas->nama_kelas ?? '-' }}
+                                    {{ $user->siswa?->kelas?->nama_kelas ?? '-' }}
                                 </td>
                             </tr>
                         @endif
@@ -69,7 +79,9 @@
                             <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Password</td>
                             <td style="padding: 8px 0;">
                                 <span
-                                    style="background-color: #e5e7eb; color: #374151; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 14px;">{{ $password }}</span>
+                                    style="background-color: #e5e7eb; color: #374151; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 14px;">
+                                    {{ $password ?? 'Tidak Berubah' }}
+                                </span>
                             </td>
                         </tr>
                     </table>

@@ -13,7 +13,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel; // Add this
+use App\Imports\SiswaImport; // Add this
+use App\Imports\GuruImport; // Add this
+use App\Exports\UserTemplateExport; // Add this
 
 class UserController extends Controller
 {
@@ -32,6 +37,8 @@ class UserController extends Controller
             $query->where('role', 'admin');
         } elseif ($filter === 'petugas') {
             $query->where('role', 'petugas');
+        } elseif ($filter === 'kepala_lab') {
+            $query->where('role', 'kepala_lab');
         } elseif ($filter === 'pengguna') {
             $query->where('role', 'pengguna');
         }
@@ -51,7 +58,14 @@ class UserController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('email', 'like', "%{$search}%")
-                    ->orWhere('nama_lengkap', 'like', "%{$search}%");
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('data_nip_nisn', 'like', "%{$search}%")
+                    ->orWhereHas('siswa', function ($sq) use ($search) {
+                        $sq->where('username', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('guru', function ($gq) use ($search) {
+                        $gq->where('username', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -70,18 +84,18 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $currentUserRole = auth()->user()->role;
+        $activateNow = $request->has('activate_now');
 
         // Determine allowed roles based on current user's role
         if ($currentUserRole === 'superadmin') {
-            $allowedRoles = 'required|in:superadmin,admin,petugas,pengguna';
+            $allowedRoles = 'required|in:superadmin,admin,petugas,kepala_lab,pengguna';
         } else {
-            // Admin can only create petugas and pengguna
-            $allowedRoles = 'required|in:petugas,pengguna';
+            // Admin can only create petugas, kepala_lab and pengguna
+            $allowedRoles = 'required|in:petugas,kepala_lab,pengguna';
         }
 
-        $request->validate([
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
+        // Build validation rules based on activation mode
+        $rules = [
             'role' => $allowedRoles,
             'nama_lengkap' => 'required|string|max:255',
             'status' => 'nullable|in:siswa,guru',
@@ -93,24 +107,45 @@ class UserController extends Controller
             'no_hp' => 'nullable|string|max:15',
             'permissions' => 'nullable|array',
             'permissions.*' => 'string',
-        ]);
+        ];
+
+        // Email and password required only if activating now
+        if ($activateNow) {
+            $rules['email'] = 'required|email|unique:users,email';
+            $rules['password'] = 'required|string|min:8';
+        }
+
+        $request->validate($rules);
 
         DB::beginTransaction();
         try {
-            $username = null;
+            $nipNisn = null;
             if ($request->status === 'siswa') {
-                $username = $request->nisn;
+                $nipNisn = $request->nisn;
             } elseif ($request->status === 'guru') {
-                $username = $request->nip;
+                $nipNisn = $request->nip;
+            }
+
+            // Determine email and password
+            if ($activateNow) {
+                $email = $request->email;
+                $password = $request->password;
+                $isActive = true;
+            } else {
+                // Inactive user: Email = NULL, Password = Random (must activate)
+                $email = null;
+                $password = Str::random(32);
+                $isActive = false;
             }
 
             $user = Auth::create([
-                'username' => $request->nama_lengkap, // Save nama_lengkap to username column
-                'email' => $request->email,
-                'data_nip_nisn' => $username,
-                'password' => Hash::make($request->password),
+                'username' => $request->nama_lengkap,
+                'email' => $email,
+                'data_nip_nisn' => $nipNisn,
+                'password' => Hash::make($password),
                 'role' => $request->role,
                 'status' => $request->status,
+                'is_active' => $isActive,
                 'permissions' => $request->role === 'petugas' ? $request->permissions : null,
             ]);
 
@@ -119,8 +154,8 @@ class UserController extends Controller
                 Siswa::create([
                     'user_id' => $user->id,
                     'nisn' => $request->nisn,
-                    'username' => $request->nama_lengkap, // Store nama_lengkap as requested
-                    'email' => $request->email,
+                    'username' => $request->nama_lengkap,
+                    'email' => $activateNow ? $request->email : null,
                     'kelas_id' => $request->kelas_id,
                     'no_hp' => $request->no_hp,
                 ]);
@@ -128,28 +163,58 @@ class UserController extends Controller
                 Guru::create([
                     'user_id' => $user->id,
                     'nip' => $request->nip,
-                    'username' => $request->nama_lengkap, // Store nama_lengkap as requested
-                    'email' => $request->email,
+                    'username' => $request->nama_lengkap,
+                    'email' => $activateNow ? $request->email : null,
                     'no_hp' => $request->no_hp,
                 ]);
             }
 
-            // Send Email via SMTP
-            try {
-                Mail::to($user->email)->send(new UserRegistered($user, $request->password, $request->nama_lengkap));
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('SMTP Error: ' . $e->getMessage());
+            // Send Email only if activating now
+            if ($activateNow) {
+                try {
+                    Mail::to($user->email)->send(new UserRegistered($user, $password, $request->nama_lengkap));
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('SMTP Error: ' . $e->getMessage());
+                }
             }
 
             DB::commit();
 
-            return redirect()->route('admin.users.index')
-                ->with('success', 'User berhasil ditambahkan dan notifikasi email dikirim!');
+            $message = $activateNow
+                ? 'User berhasil ditambahkan dan notifikasi email dikirim!'
+                : 'User berhasil ditambahkan. User harus aktivasi sendiri melalui halaman Aktivasi.';
+
+            return redirect()->route('admin.users.index')->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Gagal menambahkan user: ' . $e->getMessage()])->withInput();
         }
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+            'type' => 'required|in:siswa,guru',
+        ]);
+
+        try {
+            if ($request->type === 'siswa') {
+                Excel::import(new SiswaImport, $request->file('file'));
+            } elseif ($request->type === 'guru') {
+                Excel::import(new GuruImport, $request->file('file'));
+            }
+
+            return redirect()->back()->with('success', 'Data berhasil diimport!');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Gagal import data: ' . $e->getMessage()]);
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new UserTemplateExport, 'template_import_user.xlsx');
     }
 
     public function edit($id)
@@ -186,12 +251,12 @@ class UserController extends Controller
         $passwordRule = $request->filled('password') ? 'string|min:8' : 'nullable';
 
         $rules = [
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'email' => ['nullable', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => $passwordRule,
-            'role' => 'required|in:superadmin,admin,petugas,pengguna',
+            'role' => 'required|in:superadmin,admin,petugas,kepala_lab,pengguna',
             'nama_lengkap' => 'required|string|max:255',
             'status' => 'nullable|in:siswa,guru',
-            'kelas_id' => 'nullable|required_if:status,siswa|exists:kelas,id',
+            'kelas_id' => 'nullable|exists:kelas,id',
             'no_hp' => 'nullable|string|max:15',
             'permissions' => 'nullable|array',
             'permissions.*' => 'string',
@@ -199,17 +264,39 @@ class UserController extends Controller
 
         // If user is not superadmin, they cannot set role to superadmin/admin
         if ($currentUserRole !== 'superadmin') {
-            $rules['role'] = 'required|in:petugas,pengguna';
+            $rules['role'] = 'required|in:petugas,kepala_lab,pengguna';
         }
 
         $request->validate($rules);
 
         try {
+            // Determine activation status based on email
+            $oldEmail = $user->email;
+            $newEmail = $request->email;
+            $wasActive = $user->is_active;
+
+            // Check if this is an activation (email added) or deactivation (email removed)
+            $isActivating = false;
+            $isDeactivating = false;
+
+            if (empty($newEmail)) {
+                // Email is empty - deactivate
+                $isActive = false;
+                $isDeactivating = $wasActive;
+                $emailToSave = null;
+            } else {
+                // Email is valid - activate
+                $isActive = true;
+                $isActivating = !$wasActive;
+                $emailToSave = $newEmail;
+            }
+
             $userData = [
                 'username' => $request->nama_lengkap,
-                'email' => $request->email,
+                'email' => $emailToSave,
                 'role' => $request->role,
                 'status' => $request->status,
+                'is_active' => $isActive,
                 'permissions' => $request->role === 'petugas' ? $request->permissions : null,
             ];
 
@@ -220,7 +307,7 @@ class UserController extends Controller
                     [
                         'nisn' => $request->nisn,
                         'username' => $request->nama_lengkap,
-                        'email' => $request->email,
+                        'email' => $emailToSave,
                         'kelas_id' => $request->kelas_id,
                         'no_hp' => $request->no_hp
                     ]
@@ -234,7 +321,7 @@ class UserController extends Controller
                     [
                         'nip' => $request->nip,
                         'username' => $request->nama_lengkap,
-                        'email' => $request->email,
+                        'email' => $emailToSave,
                         'no_hp' => $request->no_hp
                     ]
                 );
@@ -242,14 +329,39 @@ class UserController extends Controller
                 $userData['data_nip_nisn'] = $request->nip;
             }
 
+            // Handle password
+            $newPassword = null;
             if ($request->filled('password')) {
                 $userData['password'] = Hash::make($request->password);
+                $newPassword = $request->password;
+            } elseif ($isActivating) {
+                // Generate new password when activating account
+                $newPassword = Str::random(10);
+                $userData['password'] = Hash::make($newPassword);
             }
 
             $user->update($userData);
 
-            return redirect()->route('admin.users.index')
-                ->with('success', 'User berhasil diperbarui!');
+            // Send Email Notification only if account is active
+            if ($isActive && !empty($emailToSave)) {
+                try {
+                    $isUpdate = !$isActivating; // New activation = welcome, Update = info update
+                    Mail::to($emailToSave)->send(new UserRegistered($user->fresh(), $newPassword, $user->username, $isUpdate));
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('SMTP Error (Update): ' . $e->getMessage());
+                }
+            }
+
+            // Build success message
+            if ($isActivating) {
+                $message = 'User berhasil diaktifkan! Detail akun telah dikirim ke email.';
+            } elseif ($isDeactivating) {
+                $message = 'User berhasil dinonaktifkan. User harus aktivasi ulang.';
+            } else {
+                $message = 'User berhasil diperbarui!';
+            }
+
+            return redirect()->route('admin.users.index')->with('success', $message);
 
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Gagal memperbarui user: ' . $e->getMessage()])->withInput();
@@ -297,6 +409,11 @@ class UserController extends Controller
 
     public function forceDelete($id)
     {
+        // Restriction: Only Super Admin can force delete
+        if (auth()->user()->role !== 'superadmin') {
+            return back()->withErrors(['error' => 'Akses Ditolak: Hanya Super Admin yang dapat menghapus data secara permanen!']);
+        }
+
         $user = Auth::onlyTrashed()->findOrFail($id);
 
         // Force delete child records

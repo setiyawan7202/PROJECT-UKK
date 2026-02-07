@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Laporan Peminjaman</title>
+    <title>Laporan Pengaduan</title>
     <style>
         body {
             font-family: sans-serif;
@@ -19,6 +19,7 @@
             padding: 8px;
             text-align: left;
             font-size: 12px;
+            vertical-align: top;
         }
 
         th {
@@ -38,39 +39,39 @@
 </head>
 
 <body>
-    <h2>Laporan Peminjaman Sarana Prasarana</h2>
+    <h2>Laporan Pengaduan Kerusakan</h2>
     <div class="meta">
         <p>Periode: {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }} -
-            {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}</p>
+            {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
+        </p>
         <p>Dicetak Tanggal: {{ date('d/m/Y') }}</p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>No</th>
-                <th>Peminjam</th>
-                <th>Barang</th>
-                <th>Tgl Pinjam</th>
-                <th>Tgl Kembali (Rencana)</th>
-                <th>Tgl Kembali (Aktual)</th>
-                <th>Status</th>
+                <th width="5%">No</th>
+                <th width="15%">Pelapor</th>
+                <th width="20%">Judul / Lokasi</th>
+                <th width="30%">Deskripsi</th>
+                <th width="15%">Tanggal</th>
+                <th width="15%">Status</th>
             </tr>
         </thead>
         <tbody>
             @foreach($data as $index => $item)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->user->nama_lengkap }}</td>
                     <td>
-                        {{ $item->barang->nama_barang }}
-                        @if($item->barangUnit)
-                            <br><small>({{ $item->barangUnit->kode_unit }})</small>
-                        @endif
+                        {{ $item->user->nama_lengkap }}<br>
+                        <small>{{ $item->user->role }}</small>
                     </td>
-                    <td>{{ $item->tgl_pinjam->format('d/m/Y') }}</td>
-                    <td>{{ $item->tgl_kembali_rencana->format('d/m/Y') }}</td>
-                    <td>{{ $item->tgl_kembali_aktual ? $item->tgl_kembali_aktual->format('d/m/Y') : '-' }}</td>
+                    <td>
+                        <strong>{{ $item->judul }}</strong><br>
+                        {{ $item->lokasi }}
+                    </td>
+                    <td>{{ $item->deskripsi }}</td>
+                    <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td>{{ ucfirst($item->status) }}</td>
                 </tr>
             @endforeach

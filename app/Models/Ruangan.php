@@ -10,7 +10,7 @@ class Ruangan extends Model
     use SoftDeletes;
 
     protected $table = 'ruangan';
-    protected $fillable = ['kode_ruangan', 'nama_ruangan', 'lokasi', 'keterangan'];
+    protected $fillable = ['kode_ruangan', 'nama_ruangan', 'lokasi', 'keterangan', 'kepala1_id', 'kepala2_id'];
 
     public static function generateKode(): string
     {
@@ -33,5 +33,15 @@ class Ruangan extends Model
     public function barangs()
     {
         return $this->hasMany(Barang::class);
+    }
+
+    public function kepala1()
+    {
+        return $this->belongsTo(Auth::class, 'kepala1_id');
+    }
+
+    public function kepala2()
+    {
+        return $this->belongsTo(Auth::class, 'kepala2_id');
     }
 }

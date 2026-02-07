@@ -33,6 +33,7 @@
                             'active' => 'bg-gray-800 text-white border border-gray-800',
                             'completed' => 'bg-white text-gray-800 border border-gray-300',
                             'rejected' => 'bg-white text-red-600 border border-red-200',
+                            'canceled' => 'bg-gray-50 text-gray-500 border border-gray-200',
                         ];
                         $statusLabels = [
                             'pending' => 'Menunggu Persetujuan',
@@ -40,6 +41,7 @@
                             'active' => 'Sedang Dipinjam',
                             'completed' => 'Selesai',
                             'rejected' => 'Ditolak',
+                            'canceled' => 'Dibatalkan',
                         ];
                     @endphp
                     <span class="px-3 py-1 rounded-md text-sm font-bold {{ $statusColors[$peminjaman->status] ?? 'bg-gray-100' }}">
@@ -212,6 +214,14 @@
                             <div>
                                 <p class="font-medium text-gray-500">Ditolak</p>
                                 <p class="text-xs text-red-500">{{ $peminjaman->keterangan_penolakan }}</p>
+                            </div>
+                        </div>
+                    @elseif($peminjaman->status == 'canceled')
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-gray-300 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">⊘</div>
+                            <div>
+                                <p class="font-medium text-gray-500">Dibatalkan</p>
+                                <p class="text-xs text-gray-500">Pengajuan dibatalkan oleh pemohon.</p>
                             </div>
                         </div>
                     @else

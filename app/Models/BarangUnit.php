@@ -10,7 +10,7 @@ class BarangUnit extends Model
     use SoftDeletes;
 
     protected $table = 'barang_unit';
-    protected $fillable = ['barang_id', 'kode_unit', 'kondisi', 'status'];
+    protected $fillable = ['barang_id', 'kode_unit', 'kondisi', 'status', 'is_lost'];
 
     public function barang()
     {

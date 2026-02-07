@@ -3,9 +3,21 @@
 @section('title', 'Riwayat Peminjaman')
 
 @section('content')
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Riwayat Peminjaman</h1>
-        <p class="text-gray-500">Daftar peminjaman barang yang Anda ajukan</p>
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Peminjaman Aktif</h1>
+            <p class="text-gray-500">Daftar peminjaman barang yang sedang proses atau berjalan</p>
+        </div>
+        <div class="flex bg-gray-100 p-1 rounded-lg">
+            <a href="{{ route('peminjaman.index') }}"
+                class="px-4 py-2 rounded-md bg-white text-black shadow-sm font-medium text-sm transition">
+                Peminjaman Aktif
+            </a>
+            <a href="{{ route('riwayat.index') }}"
+                class="px-4 py-2 rounded-md text-gray-500 hover:text-black font-medium text-sm transition">
+                Riwayat
+            </a>
+        </div>
     </div>
 
     @if(now()->isWeekend())
@@ -45,8 +57,10 @@
                 <tbody class="divide-y divide-gray-100">
                     @forelse($peminjaman as $item)
                         <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 font-mono text-xs font-medium bg-gray-100 rounded">
-                                {{ $item->kode ?? '-' }}
+                            <td class="px-6 py-4">
+                                <span class="font-mono text-xs font-medium bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                                    {{ $item->kode ?? '-' }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-900">
                                 {{ $item->barang->nama_barang }}
@@ -62,6 +76,7 @@
                                         'active' => 'bg-gray-800 text-white border border-gray-800',
                                         'completed' => 'bg-white text-gray-800 border border-gray-300',
                                         'rejected' => 'bg-white text-red-600 border border-red-200',
+                                        'canceled' => 'bg-gray-50 text-gray-500 border border-gray-200',
                                     ];
                                     $statusLabels = [
                                         'pending' => 'Menunggu',
@@ -69,6 +84,7 @@
                                         'active' => 'Dipinjam',
                                         'completed' => 'Selesai',
                                         'rejected' => 'Ditolak',
+                                        'canceled' => 'Dibatalkan',
                                     ];
                                 @endphp
                                 <span
@@ -76,8 +92,10 @@
                                     {{ $statusLabels[$item->status] ?? ucfirst($item->status) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 font-mono text-xs">
-                                {{ $item->barangUnit->kode_unit ?? '-' }}
+                            <td class="px-6 py-4">
+                                <span class="font-mono text-xs font-medium bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                                    {{ $item->barangUnit->kode_unit ?? '-' }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <a href="{{ route('peminjaman.show', $item->id) }}"

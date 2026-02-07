@@ -130,9 +130,13 @@ class CartController extends Controller
             }
         }
 
+        // Generate ONE code for the entire transaction bundle
+        $kodeTransaksi = Peminjaman::generateKode();
+
         // Create Peminjaman Records
         foreach ($cart as $id => $item) {
             Peminjaman::create([
+                'kode' => $kodeTransaksi,
                 'user_id' => Auth::id(),
                 'barang_id' => $item['barang_id'],
                 'barang_unit_id' => $item['unit_id'],

@@ -27,6 +27,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::resource('peminjaman', PeminjamanController::class)->only(['index', 'show', 'destroy']);
+    Route::get('/riwayat', [PeminjamanController::class, 'history'])->name('riwayat.index');
     Route::get('/peminjaman/{id}/download-pdf', [PeminjamanController::class, 'downloadPdf'])->name('peminjaman.download-pdf');
     Route::get('/peminjaman/{id}/cetak', [PeminjamanController::class, 'cetakBukti'])->name('peminjaman.cetak');
 
@@ -45,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
 
     // Riwayat Alias
-    Route::get('/riwayat', fn() => redirect()->route('peminjaman.index'))->name('riwayat.index');
+    // Riwayat (Moved above)
 
     // Pengaduan Routes
     Route::get('/pengaduan', [App\Http\Controllers\PengaduanController::class, 'index'])->name('pengaduan.index');

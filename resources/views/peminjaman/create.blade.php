@@ -7,63 +7,69 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
     <style>
-        /* Custom Select2 styling to match design system */
-        .select2-container .select2-selection--single {
-            height: 48px !important;
-            border: 1px solid #d1d5db !important;
-            border-radius: 0.5rem !important;
-            padding: 0.25rem 0.5rem !important;
-            background-color: white !important;
-            display: flex !important;
-            align-items: center !important;
+        .flatpickr-day.disabled {
+            color: rgba(255, 255, 255, 0.1) !important;
+            background: transparent !important;
+            cursor: not-allowed !important;
         }
 
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: normal !important;
-            color: #111827 !important;
-            padding-left: 0.5rem !important;
+        .flatpickr-day.flatpickr-disabled,
+        .flatpickr-day.flatpickr-disabled:hover {
+            cursor: not-allowed !important;
+            color: #ccc !important;
         }
+    </style>
+    /* Custom Select2 styling to match design system */
+    .select2-container .select2-selection--single {
+    height: 48px !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.5rem !important;
+    padding: 0.25rem 0.5rem !important;
+    background-color: white !important;
+    display: flex !important;
+    align-items: center !important;
+    }
 
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 46px !important;
-            right: 10px !important;
-        }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: normal !important;
+    color: #111827 !important;
+    padding-left: 0.5rem !important;
+    }
 
-        .select2-container--default.select2-container--focus .select2-selection--single {
-            border-color: #000 !important;
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
-        }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 46px !important;
+    right: 10px !important;
+    }
 
-        .select2-dropdown {
-            border: 1px solid #d1d5db !important;
-            border-radius: 0.5rem !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-            z-index: 50;
-        }
+    .select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #000 !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+    }
 
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #000 !important;
-            color: white !important;
-        }
+    .select2-dropdown {
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    z-index: 50;
+    }
 
-        .select2-container--default .select2-search--dropdown .select2-search__field {
-            border: 1px solid #d1d5db !important;
-            border-radius: 0.375rem !important;
-            padding: 0.5rem !important;
-        }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #000 !important;
+    color: white !important;
+    }
 
-        .select2-container--default .select2-search--dropdown .select2-search__field:focus {
-            border-color: #000 !important;
-            outline: none !important;
-        }
-        
-        /* Flatpickr override */
-        .flatpickr-calendar {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-            border-radius: 0.5rem !important;
-            border: 1px solid #e5e7eb !important;
-        }
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.375rem !important;
+    padding: 0.5rem !important;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+    border-color: #000 !important;
+    outline: none !important;
+    }
     </style>
 @endpush
 
@@ -137,10 +143,20 @@
             <div class="mb-5">
                 <label for="tgl_pinjam" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Pinjam <span
                         class="text-red-500">*</span></label>
-                <input type="text" id="tgl_pinjam" name="tgl_pinjam"
-                    value="{{ old('tgl_pinjam', $today ?? date('Y-m-d')) }}" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition bg-white" readonly placeholder="Pilih tanggal pinjam...">
-                <p class="text-gray-500 text-xs mt-1">Tidak dapat memilih hari Sabtu dan Minggu</p>
+                <div class="relative">
+                    <input type="text" id="tgl_pinjam" name="tgl_pinjam"
+                        value="{{ old('tgl_pinjam', $today ?? date('Y-m-d')) }}" required readonly
+                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition bg-white cursor-pointer"
+                        placeholder="Pilih tanggal pinjam...">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-xs mt-1">Sabtu, Minggu, dan hari lampau tidak bisa dipilih</p>
+                <p id="error_tgl_pinjam" class="text-red-500 text-xs mt-1 hidden"></p>
                 @error('tgl_pinjam')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
@@ -150,11 +166,21 @@
             <div class="mb-5">
                 <label for="tgl_kembali_rencana" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Kembali
                     (Rencana) <span class="text-red-500">*</span></label>
-                <input type="text" id="tgl_kembali_rencana" name="tgl_kembali_rencana"
-                    value="{{ old('tgl_kembali_rencana', $tomorrow ?? date('Y-m-d', strtotime('+1 day'))) }}" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition bg-white" readonly placeholder="Pilih estimasi kembali...">
-                <p class="text-gray-500 text-xs mt-1">Maksimal 7 hari dari tanggal pinjam, tidak dapat memilih hari Sabtu
-                    dan Minggu</p>
+                <div class="relative">
+                    <input type="text" id="tgl_kembali_rencana" name="tgl_kembali_rencana"
+                        value="{{ old('tgl_kembali_rencana', $tomorrow ?? date('Y-m-d', strtotime('+1 day'))) }}" required
+                        readonly
+                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition bg-white cursor-pointer"
+                        placeholder="Pilih estimasi kembali...">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-xs mt-1">Minimal 1 hari, maksimal 7 hari</p>
+                <p id="error_tgl_kembali" class="text-red-500 text-xs mt-1 hidden"></p>
                 @error('tgl_kembali_rencana')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
@@ -197,6 +223,54 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
     <script>
         $(document).ready(function () {
+            // Function to disable weekends
+            const disableWeekends = function (date) {
+                return (date.getDay() === 0 || date.getDay() === 6);
+            };
+
+            // Initialize Flatpickr for Tanggal Kembali
+            const fpKembali = flatpickr("#tgl_kembali_rencana", {
+                locale: "id",
+                altInput: true,
+                altFormat: "d F Y",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: [disableWeekends]
+            });
+
+            // Initialize Flatpickr for Tanggal Pinjam
+            const fpPinjam = flatpickr("#tgl_pinjam", {
+                locale: "id",
+                altInput: true,
+                altFormat: "d F Y",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: [disableWeekends],
+                onChange: function (selectedDates, dateStr, instance) {
+                    if (selectedDates.length > 0) {
+                        const borrowDate = selectedDates[0];
+
+                        // Min date kembali = tanggal pinjam + 1 hari (tidak boleh hari yang sama)
+                        const minReturnDate = new Date(borrowDate);
+                        minReturnDate.setDate(minReturnDate.getDate() + 1);
+
+                        // Max date kembali = tanggal pinjam + 7 hari
+                        const maxReturnDate = new Date(borrowDate);
+                        maxReturnDate.setDate(maxReturnDate.getDate() + 7);
+
+                        fpKembali.set('minDate', minReturnDate);
+                        fpKembali.set('maxDate', maxReturnDate);
+
+                        if (fpKembali.selectedDates.length > 0) {
+                            const currentReturn = fpKembali.selectedDates[0];
+                            if (currentReturn < minReturnDate || currentReturn > maxReturnDate) {
+                                fpKembali.clear();
+                            }
+                        }
+                    }
+                }
+            });
+
             // Initialize Select2 for Barang dropdown if it exists
             if ($('.select2-barang').length > 0) {
                 $('.select2-barang').select2({
@@ -210,69 +284,89 @@
                 });
             }
 
-            // Flatpickr Configuration
-            const today = new Date();
-            
-            // Function to disable weekends (Sunday=0, Saturday=6)
-            const disableWeekends = function(date) {
-                return (date.getDay() === 0 || date.getDay() === 6);
+            // Date Validation Utilities
+            const isWeekend = function (date) {
+                const day = date.getDay();
+                return (day === 0 || day === 6); // Sunday = 0, Saturday = 6
             };
 
-            // Initialize Borrow Date Picker
-            const fpPinjam = flatpickr("#tgl_pinjam", {
-                dateFormat: "Y-m-d",
-                minDate: "today",
-                disable: [disableWeekends],
-                locale: "id",
-                onChange: function(selectedDates, dateStr, instance) {
-                    if (selectedDates.length > 0) {
-                        const borrowDate = selectedDates[0];
-                        
-                        // Update Return Date constraints
-                        const maxReturnDate = new Date(borrowDate);
-                        maxReturnDate.setDate(maxReturnDate.getDate() + 7);
+            // DOM Elements
+            const errorPinjam = document.getElementById('error_tgl_pinjam');
+            const errorKembali = document.getElementById('error_tgl_kembali');
+            const form = document.querySelector('form');
 
-                        fpKembali.set('minDate', borrowDate);
-                        fpKembali.set('maxDate', maxReturnDate);
-                        
-                        // If current return date is invalid (before new min or after new max or weekend)
-                        const currentReturn = fpKembali.selectedDates[0];
-                        if (currentReturn) {
-                            if (currentReturn < borrowDate || currentReturn > maxReturnDate || disableWeekends(currentReturn)) {
-                                fpKembali.clear(); // Clear invalid date
-                            }
-                        } else {
-                             // Optional: Set default return date to avoid empty field logic if needed
-                        }
+            // Show error function
+            const showError = function (element, message) {
+                element.textContent = message;
+                element.classList.remove('hidden');
+            };
+
+            const hideError = function (element) {
+                element.textContent = '';
+                element.classList.add('hidden');
+            };
+
+            // Form submission validation
+            form.addEventListener('submit', function (e) {
+                let hasError = false;
+                hideError(errorPinjam);
+                hideError(errorKembali);
+
+                const tglPinjamVal = document.getElementById('tgl_pinjam').value;
+                const tglKembaliVal = document.getElementById('tgl_kembali_rencana').value;
+
+                // Validate borrow date
+                if (!tglPinjamVal) {
+                    showError(errorPinjam, 'Tanggal pinjam wajib diisi.');
+                    hasError = true;
+                } else {
+                    const d = new Date(tglPinjamVal);
+                    if (isWeekend(d)) {
+                        showError(errorPinjam, 'Tanggal pinjam tidak boleh jatuh pada hari Sabtu atau Minggu.');
+                        hasError = true;
+                    }
+                }
+
+                // Validate return date
+                if (!tglKembaliVal) {
+                    showError(errorKembali, 'Tanggal kembali wajib diisi.');
+                    hasError = true;
+                } else {
+                    const d = new Date(tglKembaliVal);
+                    if (isWeekend(d)) {
+                        showError(errorKembali, 'Tanggal kembali tidak boleh jatuh pada hari Sabtu atau Minggu.');
+                        hasError = true;
+                    }
+                }
+
+                // Validate return date is after borrow date
+                if (tglPinjamVal && tglKembaliVal) {
+                    if (tglKembaliVal < tglPinjamVal) {
+                        showError(errorKembali, 'Tanggal kembali tidak boleh sebelum tanggal pinjam.');
+                        hasError = true;
+                    }
+
+                    // Validate max 7 days
+                    const borrowDate = new Date(tglPinjamVal);
+                    const returnDate = new Date(tglKembaliVal);
+                    const diffTime = returnDate - borrowDate;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays > 7) {
+                        showError(errorKembali, 'Durasi peminjaman maksimal 7 hari.');
+                        hasError = true;
+                    }
+                }
+
+                if (hasError) {
+                    e.preventDefault();
+                    // Scroll to first error
+                    const firstError = document.querySelector('.text-red-500:not(.hidden)');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
                 }
             });
-
-            // Initialize Return Date Picker
-            const fpKembali = flatpickr("#tgl_kembali_rencana", {
-                dateFormat: "Y-m-d",
-                minDate: "today",
-                disable: [disableWeekends],
-                locale: "id"
-            });
-            
-            // Initial Sync if values exist (e.g. from old input / validation error)
-            const initialBorrowStr = document.getElementById('tgl_pinjam').value;
-            if (initialBorrowStr) {
-                 const parts = initialBorrowStr.split('-');
-                 if (parts.length === 3) {
-                     // Month 0-indexed
-                     const initialBorrowDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                     if (!isNaN(initialBorrowDate.getTime())) {
-                         const maxReturnDate = new Date(initialBorrowDate);
-                         maxReturnDate.setDate(maxReturnDate.getDate() + 7);
-                         
-                         // Set min/max on return picker
-                         fpKembali.set('minDate', initialBorrowDate);
-                         fpKembali.set('maxDate', maxReturnDate);
-                     }
-                 }
-            }
         });
     </script>
 @endpush

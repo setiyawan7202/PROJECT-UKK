@@ -1,0 +1,184 @@
+# Rencana Implementasi Tier 2.1
+
+## Ringkasan
+
+Implementasi **fitur Tier 2** yang terdiri dari:
+1. **Inspeksi Pra-Peminjaman & Checklist Kondisi**
+2. **Penjadwalan Maintenance & Tracking Preventif**
+
+**Status**: Kedua fitur **BELUM ADA** di sistem saat ini.
+
+---
+
+## Bagian 1: Inspeksi Pra-Peminjaman & Checklist Kondisi
+
+### Matriks Hak Akses
+
+| Fitur | Admin | Petugas | Pengguna |
+|-------|:-----:|:-------:|:--------:|
+| Buat & Kelola Template Checklist | ✓ | - | - |
+| Lakukan Inspeksi Pra-Peminjaman | ✓ | ✓ | - |
+| Ambil Foto Baseline Aset | ✓ | ✓ | - |
+| Bandingkan Kondisi Sebelum vs Sesudah | ✓ | ✓ | - |
+| Auto-Flag Kerusakan Terdeteksi | ✓ | ✓ | - |
+
+### Skema Database
+
+#### [BARU] Tabel `checklist_templates`
+
+| Kolom | Tipe | Deskripsi |
+|-------|------|-----------|
+| id | bigint | PK |
+| kategori_id | bigint FK | Kategori aset |
+| nama | string | Nama template |
+| items | json | Array item checklist |
+| created_by | bigint FK | Admin pembuat |
+| timestamps | | |
+
+**Contoh Items JSON:**
+```json
+[
+  {"key": "layar_bersih", "label": "Layar Bersih"},
+  {"key": "lampu_menyala", "label": "Lampu Menyala"},
+  {"key": "kabel_lengkap", "label": "Kabel Lengkap"}
+]
+```
+
+#### [BARU] Tabel `inspections`
+
+| Kolom | Tipe | Deskripsi |
+|-------|------|-----------|
+| id | bigint | PK |
+| peminjaman_id | bigint FK | Peminjaman terkait |
+| barang_unit_id | bigint FK | Unit diinspeksi |
+| type | enum | `pre_borrow` / `post_return` |
+| checklist_data | json | Hasil checklist |
+| photo_path | string null | Path foto |
+| notes | text null | Catatan |
+| inspector_id | bigint FK | Petugas inspeksi |
+| has_damage | boolean | Flag kerusakan |
+| damage_details | text null | Detail kerusakan |
+| inspected_at | timestamp | |
+
+### Alur Kerja
+
+```mermaid
+flowchart TD
+    A[Peminjaman Approved] --> B[Petugas: Inspeksi Pra-Peminjaman]
+    B --> C[Isi Checklist + Foto Baseline]
+    C --> D[Barang Diserahkan → Status: Active]
+    D --> E[Peminjam Kembalikan]
+    E --> F[Petugas: Inspeksi Pasca-Pengembalian]
+    F --> G[Sistem: Bandingkan Checklist]
+    G -->|Sama| H[Status: Returned]
+    G -->|Berbeda| I[Auto-Flag Kerusakan]
+    I --> H
+```
+
+### File yang Dibuat/Dimodifikasi
+
+| Aksi | File |
+|------|------|
+| [BARU] | `migrations/create_checklist_templates_table.php` |
+| [BARU] | `migrations/create_inspections_table.php` |
+| [BARU] | `Models/ChecklistTemplate.php` |
+| [BARU] | `Models/Inspection.php` |
+| [BARU] | `Controllers/Admin/ChecklistTemplateController.php` |
+| [BARU] | `views/admin/checklist-templates/index,create,edit.blade.php` |
+| [BARU] | `views/admin/peminjaman/inspect.blade.php` |
+| [BARU] | `views/staff/peminjaman/inspect.blade.php` |
+| [MODIF] | [Controllers/Admin/PeminjamanController.php](file:///d:/laragon/www/PROJECT-UKK/app/Http/Controllers/Admin/PeminjamanController.php) |
+| [MODIF] | [Controllers/Staff/PeminjamanController.php](file:///d:/laragon/www/PROJECT-UKK/app/Http/Controllers/Staff/PeminjamanController.php) |
+| [MODIF] | `views/*/peminjaman/show.blade.php` |
+
+---
+
+## Bagian 2: Penjadwalan Maintenance & Tracking Preventif
+
+### Matriks Hak Akses
+
+| Fitur | Admin | Petugas | Pengguna |
+|-------|:-----:|:-------:|:--------:|
+| Set Jadwal Maintenance per Tipe Aset | ✓ | - | - |
+| Auto-Remind Tanggal Jatuh Tempo | ✓ | ✓ | - |
+| Catat Aktivitas Maintenance | ✓ | ✓ | - |
+| Lihat Riwayat Maintenance | ✓ | ✓ | - |
+| Prediksi Maintenance Berdasarkan Riwayat | ✓ | - | - |
+
+### Skema Database
+
+#### [BARU] Tabel `maintenance_schedules`
+
+| Kolom | Tipe | Deskripsi |
+|-------|------|-----------|
+| id | bigint | PK |
+| kategori_id | bigint FK null | Jadwal per kategori |
+| barang_id | bigint FK null | Atau per barang spesifik |
+| interval_days | int | Interval hari (90 = 3 bulan) |
+| next_maintenance_at | date | Tanggal jatuh tempo |
+| reminder_days | json | Array hari pengingat [7, 3, 0] |
+| created_by | bigint FK | Admin pembuat |
+| timestamps | | |
+
+#### [BARU] Tabel `maintenance_logs`
+
+| Kolom | Tipe | Deskripsi |
+|-------|------|-----------|
+| id | bigint | PK |
+| barang_unit_id | bigint FK | Unit yang di-maintenance |
+| schedule_id | bigint FK null | Jadwal terkait |
+| maintenance_date | date | Tanggal dilakukan |
+| description | text | Deskripsi pekerjaan |
+| technician_name | string | Nama teknisi |
+| performed_by | bigint FK | User yang mencatat |
+| notes | text null | Catatan |
+| timestamps | | |
+
+### Fitur Analytics
+
+1. **Frekuensi Kerusakan Tinggi** → Prioritas maintenance lebih sering
+2. **Alat Jarang Rusak** → Maintenance minimum (hemat biaya)
+3. **Maintenance History Report** → Timeline kerusakan & maintenance per alat
+
+### Sistem Reminder
+
+- **H-7**: Notifikasi pertama (maintenance mendekati)
+- **H-3**: Notifikasi kedua (segera jadwalkan)
+- **H-0**: Notifikasi urgent (jatuh tempo hari ini)
+
+### File yang Dibuat/Dimodifikasi
+
+| Aksi | File |
+|------|------|
+| [BARU] | `migrations/create_maintenance_schedules_table.php` |
+| [BARU] | `migrations/create_maintenance_logs_table.php` |
+| [BARU] | `Models/MaintenanceSchedule.php` |
+| [BARU] | `Models/MaintenanceLog.php` |
+| [BARU] | `Controllers/Admin/MaintenanceController.php` |
+| [BARU] | `Controllers/Staff/MaintenanceController.php` (read-only) |
+| [BARU] | `Console/Commands/CheckMaintenanceDue.php` |
+| [BARU] | `views/admin/maintenance/index,create,logs.blade.php` |
+| [MODIF] | `views/admin/barang/show.blade.php` (tampilkan riwayat) |
+| [MODIF] | Sidebar Admin & Staff |
+
+---
+
+## Rencana Verifikasi
+
+1. Buat template checklist untuk kategori "Laptop"
+2. Approve peminjaman → Lakukan inspeksi pra-peminjaman dengan foto
+3. Proses return → Inspeksi pasca-pengembalian dengan kondisi berbeda
+4. Verifikasi sistem auto-flag kerusakan
+5. Buat jadwal maintenance 90 hari untuk kategori
+6. Catat aktivitas maintenance
+7. Verifikasi reminder muncul di dashboard
+
+---
+
+## Estimasi
+
+| Komponen | Tool Calls |
+|----------|------------|
+| Bagian 1: Sistem Inspeksi | ~35 |
+| Bagian 2: Sistem Maintenance | ~30 |
+| **Total** | ~65 |

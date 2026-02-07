@@ -38,6 +38,9 @@ Route::middleware(['auth', 'petugas'])->prefix('staff')->name('staff.')->group(f
     Route::post('/peminjaman/{id}/approve', [PeminjamanController::class, 'approve'])->name('peminjaman.approve');
     Route::post('/peminjaman/{id}/reject', [PeminjamanController::class, 'reject'])->name('peminjaman.reject');
 
+    Route::get('/peminjaman/{id}/inspect', [PeminjamanController::class, 'inspectForm'])->name('peminjaman.inspect');
+    Route::post('/peminjaman/{id}/inspect', [PeminjamanController::class, 'storeInspection'])->name('peminjaman.storeInspection');
+
     Route::middleware(['block.weekend'])->group(function () {
         Route::post('/peminjaman/{id}/activate', [PeminjamanController::class, 'activate'])->name('peminjaman.activate');
         Route::get('/peminjaman/{id}/return', [PeminjamanController::class, 'returnForm'])->name('peminjaman.return');

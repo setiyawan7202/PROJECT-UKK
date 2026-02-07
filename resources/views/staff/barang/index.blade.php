@@ -33,18 +33,20 @@
 
     <div class="bg-white border border-gray-100 rounded-xl overflow-hidden">
         <div class="p-4 border-b border-gray-100">
-            <form action="{{ route('staff.barang.index') }}" method="GET" class="flex flex-col md:flex-row gap-3">
+            <form id="searchForm" action="{{ route('staff.barang.index') }}" method="GET"
+                class="flex flex-col md:flex-row gap-3">
                 <div class="relative flex-1">
                     <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama barang..."
+                    <input type="text" id="searchInput" name="search" value="{{ request('search') }}"
+                        placeholder="Cari nama barang..."
                         class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-black">
                 </div>
                 <div class="w-full md:w-48">
-                    <select name="kategori_id"
+                    <select name="kategori_id" onchange="this.form.submit()"
                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-1 focus:ring-black">
                         <option value="">Semua Kategori</option>
                         @foreach($kategoris as $cat)
@@ -55,7 +57,7 @@
                     </select>
                 </div>
                 <div class="w-full md:w-48">
-                    <select name="ruangan_id"
+                    <select name="ruangan_id" onchange="this.form.submit()"
                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-1 focus:ring-black">
                         <option value="">Semua Ruangan</option>
                         @foreach($ruangans as $room)
@@ -66,17 +68,27 @@
                     </select>
                 </div>
                 <div class="w-full md:w-48">
-                    <select name="jenis_aset"
+                    <select name="jenis_aset" onchange="this.form.submit()"
                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-1 focus:ring-black">
                         <option value="">Semua Jenis Aset</option>
                         <option value="tik" {{ request('jenis_aset') == 'tik' ? 'selected' : '' }}>Aset TIK</option>
                         <option value="non_tik" {{ request('jenis_aset') == 'non_tik' ? 'selected' : '' }}>Non-TIK</option>
                     </select>
                 </div>
-                <button type="submit"
-                    class="bg-gray-100 px-6 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-200 transition">Filter</button>
             </form>
         </div>
+
+        @push('scripts')
+            <script>
+                let searchTimeout;
+                document.getElementById('searchInput')?.addEventListener('input', function () {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        document.getElementById('searchForm').submit();
+                    }, 500);
+                });
+            </script>
+        @endpush
 
         <div class="overflow-x-auto w-full">
             <table class="w-full min-w-[1000px] text-left text-sm whitespace-nowrap">

@@ -79,10 +79,24 @@
             <p class="text-sm text-gray-500 mb-6">
                 Laporan lengkap kondisi seluruh unit barang (Baik, Rusak, Maintenance) per hari ini.
             </p>
+        </div>
+
+        <!-- Asset Health Dashboard -->
+        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                Kesehatan Aset
+            </h3>
+            <p class="text-sm text-gray-500 mb-6">
+                Dashboard analitik kondisi aset, tracking barang rusak & hilang, dan top 10 kerusakan.
+            </p>
             <div class="mt-auto">
-                <a href="{{ route('admin.laporan.barang') }}" target="_blank"
-                    class="block w-full text-center bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">
-                    Download PDF
+                <a href="{{ route('admin.laporan.assetHealth') }}"
+                    class="block w-full text-center bg-black text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition">
+                    Lihat Dashboard
                 </a>
             </div>
         </div>

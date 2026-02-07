@@ -63,6 +63,31 @@
                         class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-black">{{ old('keterangan', $ruangan->keterangan) }}</textarea>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="kepala1_id" class="block text-sm font-medium text-gray-700 mb-2">Kepala Lab 1</label>
+                        <select id="kepala1_id" name="kepala1_id" class="searchable-select w-full">
+                            <option value="">Pilih Kepala Lab 1</option>
+                            @foreach($kepalaUsers as $user)
+                                <option value="{{ $user->id }}" {{ old('kepala1_id', $ruangan->kepala1_id) == $user->id ? 'selected' : '' }}>
+                                    {{ $user->username }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="kepala2_id" class="block text-sm font-medium text-gray-700 mb-2">Kepala Lab 2</label>
+                        <select id="kepala2_id" name="kepala2_id" class="searchable-select w-full">
+                            <option value="">Pilih Kepala Lab 2</option>
+                            @foreach($kepalaUsers as $user)
+                                <option value="{{ $user->id }}" {{ old('kepala2_id', $ruangan->kepala2_id) == $user->id ? 'selected' : '' }}>
+                                    {{ $user->username }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
                 <div class="flex items-center gap-4 mt-8">
                     <button type="submit"
                         class="bg-black text-white px-6 py-3 rounded-xl font-medium hover:bg-gray-800 transition">Simpan

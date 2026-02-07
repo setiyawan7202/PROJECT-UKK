@@ -2,6 +2,61 @@
 
 @section('title', 'Keranjang Peminjaman')
 
+@push('styles')
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .flatpickr-day.disabled,
+        .flatpickr-day.flatpickr-disabled {
+            color: rgba(0, 0, 0, 0.2) !important;
+            background: transparent !important;
+            cursor: not-allowed !important;
+        }
+
+        .flatpickr-day.flatpickr-disabled:hover {
+            background: transparent !important;
+        }
+
+        .flatpickr-calendar {
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .flatpickr-months .flatpickr-month {
+            background: #000;
+            color: #fff;
+            border-radius: 0.75rem 0.75rem 0 0;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months,
+        .flatpickr-current-month input.cur-year {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .flatpickr-months .flatpickr-prev-month,
+        .flatpickr-months .flatpickr-next-month {
+            fill: #fff;
+        }
+
+        .flatpickr-months .flatpickr-prev-month:hover svg,
+        .flatpickr-months .flatpickr-next-month:hover svg {
+            fill: #ccc;
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.selected:hover {
+            background: #000 !important;
+            border-color: #000 !important;
+            color: #fff !important;
+        }
+
+        .flatpickr-day:hover {
+            background: #f3f4f6;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="max-w-4xl mx-auto">
         <h1 class="text-2xl font-bold text-gray-900 mb-6">Keranjang Peminjaman</h1>
@@ -87,8 +142,20 @@
                             <div class="mb-4">
                                 <label for="tgl_pinjam" class="block text-sm font-medium text-gray-700 mb-1">Tanggal
                                     Pinjam</label>
-                                <input type="date" name="tgl_pinjam" id="tgl_pinjam" value="{{ old('tgl_pinjam', $today) }}"
-                                    required class="w-full rounded-lg border-gray-300 focus:border-black focus:ring-black">
+                                <div class="relative">
+                                    <input type="text" name="tgl_pinjam" id="tgl_pinjam" value="{{ old('tgl_pinjam', $today) }}"
+                                        required readonly
+                                        class="w-full pl-10 pr-4 py-2.5 rounded-lg border-gray-300 focus:border-black focus:ring-black cursor-pointer bg-white"
+                                        placeholder="Pilih tanggal pinjam...">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="text-gray-500 text-xs mt-1">Sabtu & Minggu tidak tersedia</p>
                                 @error('tgl_pinjam') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
@@ -96,9 +163,20 @@
                             <div class="mb-4">
                                 <label for="tgl_kembali_rencana" class="block text-sm font-medium text-gray-700 mb-1">Tanggal
                                     Kembali</label>
-                                <input type="date" name="tgl_kembali_rencana" id="tgl_kembali_rencana"
-                                    value="{{ old('tgl_kembali_rencana', $tomorrow) }}" required
-                                    class="w-full rounded-lg border-gray-300 focus:border-black focus:ring-black">
+                                <div class="relative">
+                                    <input type="text" name="tgl_kembali_rencana" id="tgl_kembali_rencana"
+                                        value="{{ old('tgl_kembali_rencana', $tomorrow) }}" required readonly
+                                        class="w-full pl-10 pr-4 py-2.5 rounded-lg border-gray-300 focus:border-black focus:ring-black cursor-pointer bg-white"
+                                        placeholder="Pilih tanggal kembali...">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="text-gray-500 text-xs mt-1">Minimal 1 hari, maksimal 7 hari dari tanggal pinjam</p>
                                 @error('tgl_kembali_rencana') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
@@ -123,3 +201,69 @@
         @endif
     </div>
 @endsection
+
+@push('scripts')
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fungsi untuk menonaktifkan hari Sabtu dan Minggu
+            const disableWeekends = function (date) {
+                return (date.getDay() === 0 || date.getDay() === 6);
+            };
+
+            // Inisialisasi Flatpickr untuk Tanggal Kembali
+            const fpKembali = flatpickr("#tgl_kembali_rencana", {
+                locale: "id",
+                altInput: true,
+                altFormat: "d F Y",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: [disableWeekends],
+                clickOpens: true
+            });
+
+            // Inisialisasi Flatpickr untuk Tanggal Pinjam
+            const fpPinjam = flatpickr("#tgl_pinjam", {
+                locale: "id",
+                altInput: true,
+                altFormat: "d F Y",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: [disableWeekends],
+                clickOpens: true,
+                onChange: function (selectedDates, dateStr, instance) {
+                    if (selectedDates.length > 0) {
+                        const borrowDate = selectedDates[0];
+                        
+                        // Min date kembali = tanggal pinjam + 1 hari (tidak boleh hari yang sama)
+                        const minReturnDate = new Date(borrowDate);
+                        minReturnDate.setDate(minReturnDate.getDate() + 1);
+                        
+                        // Max date kembali = tanggal pinjam + 7 hari
+                        const maxReturnDate = new Date(borrowDate);
+                        maxReturnDate.setDate(maxReturnDate.getDate() + 7);
+
+                        // Update rentang tanggal untuk kalender kembali
+                        fpKembali.set('minDate', minReturnDate);
+                        fpKembali.set('maxDate', maxReturnDate);
+
+                        // Reset tanggal kembali jika di luar rentang
+                        if (fpKembali.selectedDates.length > 0) {
+                            const currentReturn = fpKembali.selectedDates[0];
+                            if (currentReturn < minReturnDate || currentReturn > maxReturnDate) {
+                                fpKembali.clear();
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Trigger onChange untuk set initial max date
+            if (fpPinjam.selectedDates.length > 0) {
+                fpPinjam.config.onChange[0](fpPinjam.selectedDates, fpPinjam.input.value, fpPinjam);
+            }
+        });
+    </script>
+@endpush

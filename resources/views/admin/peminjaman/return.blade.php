@@ -49,8 +49,8 @@
                 <div>
                     <label for="tgl_kembali" class="block text-sm font-medium text-gray-700 mb-2">Tanggal
                         Dikembalikan</label>
-                    <input type="date" name="tgl_kembali" id="tgl_kembali" value="{{ date('Y-m-d') }}"
-                        class="w-full rounded-lg border-gray-300 focus:border-black focus:ring-black transition" required>
+                    <input type="text" name="tgl_kembali" id="tgl_kembali" value="{{ date('Y-m-d') }}"
+                        class="w-full rounded-lg border-gray-300 focus:border-black focus:ring-black transition bg-white" required>
                     @error('tgl_kembali')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
@@ -113,4 +113,26 @@
             </form>
         </div>
     </div>
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 @endsection
+
+@push('scripts')
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+    <script>
+        flatpickr("#tgl_kembali", {
+            locale: "id",
+            altInput: true,
+            altFormat: "d F Y",
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disable: [
+                function(date) {
+                    return (date.getDay() === 0 || date.getDay() === 6);
+                }
+            ]
+        });
+    </script>
+@endpush

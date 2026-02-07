@@ -35,7 +35,7 @@ class LaporanController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $pdf = Pdf::loadView('admin.laporan.pdf_peminjaman', [
+        $pdf = Pdf::loadView('pdf.laporan-peminjaman', [
             'data' => $data,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
@@ -59,7 +59,7 @@ class LaporanController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $pdf = Pdf::loadView('admin.laporan.pdf_pengaduan', [
+        $pdf = Pdf::loadView('pdf.laporan-pengaduan', [
             'data' => $data,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
@@ -98,7 +98,7 @@ class LaporanController extends Controller
             return $item;
         });
 
-        $pdf = Pdf::loadView('admin.laporan.pdf_barang', [
+        $pdf = Pdf::loadView('pdf.laporan-barang', [
             'data' => $data,
             'damagedItems' => $damagedItems,
             'mostProblematic' => $mostProblematic,
@@ -106,5 +106,88 @@ class LaporanController extends Controller
         ]);
 
         return $pdf->stream('laporan-aset-barang.pdf');
+    }
+
+    /**
+     * Asset Health Dashboard (Dedicated Page)
+     */
+    public function assetHealth()
+    {
+        // ... (existing code)
+        // Damaged Items (Rusak & Hilang)
+        $damagedItems = BarangUnit::whereIn('status', ['rusak'])->with('barang.kategori')->get();
+        $lostItems = BarangUnit::where('is_lost', true)->with('barang.kategori')->get();
+
+        // Top 10 Most Damaged Assets
+        $topDamagedAssets = DB::table('pengembalian')
+            ->join('peminjaman', 'pengembalian.peminjaman_id', '=', 'peminjaman.id')
+            ->join('barang', 'peminjaman.barang_id', '=', 'barang.id')
+            ->whereIn('pengembalian.kondisi', ['rusak_ringan', 'rusak_berat', 'hilang'])
+            ->select('barang.id', 'barang.nama_barang', 'barang.kode', DB::raw('COUNT(*) as total_rusak'))
+            ->groupBy('barang.id', 'barang.nama_barang', 'barang.kode')
+            ->orderByDesc('total_rusak')
+            ->limit(10)
+            ->get();
+
+        // Summary Statistics
+        $totalAssets = BarangUnit::count();
+        $activeAssets = BarangUnit::where('status', 'aktif')->count();
+        $damagedCount = BarangUnit::where('status', 'rusak')->where('is_lost', false)->count();
+        $lostCount = BarangUnit::where('is_lost', true)->count();
+
+        // Assets by Condition
+        $assetsByCondition = BarangUnit::select('kondisi', DB::raw('COUNT(*) as total'))
+            ->groupBy('kondisi')
+            ->get()
+            ->pluck('total', 'kondisi')
+            ->toArray();
+
+        // Recent Damage History (Last 30 days)
+        $recentDamages = DB::table('pengembalian')
+            ->join('peminjaman', 'pengembalian.peminjaman_id', '=', 'peminjaman.id')
+            ->join('barang', 'peminjaman.barang_id', '=', 'barang.id')
+            ->join('users', 'peminjaman.user_id', '=', 'users.id')
+            ->select('pengembalian.*', 'barang.nama_barang', 'users.username as nama_lengkap')
+            ->whereIn('pengembalian.kondisi', ['rusak_ringan', 'rusak_berat', 'hilang'])
+            ->where('pengembalian.created_at', '>=', now()->subDays(30))
+            ->orderByDesc('pengembalian.created_at')
+            ->limit(20)
+            ->get();
+
+        // Damage Trend (Last 6 months)
+        $damageTrend = DB::table('pengembalian')
+            ->whereIn('kondisi', ['rusak_ringan', 'rusak_berat', 'hilang'])
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as total")
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->pluck('total', 'month')
+            ->toArray();
+
+        return view('admin.laporan.asset-health', compact(
+            'damagedItems',
+            'lostItems',
+            'topDamagedAssets',
+            'totalAssets',
+            'activeAssets',
+            'damagedCount',
+            'lostCount',
+            'assetsByCondition',
+            'recentDamages',
+            'damageTrend'
+        ));
+    }
+
+    /**
+     * Analytics & Location Dashboard
+     */
+    public function analytics()
+    {
+        $service = new \App\Services\AssetAnalyticsService();
+        $risks = $service->getAssetRisks(50);
+        $locations = $service->getLocationStats();
+
+        return view('admin.laporan.analytics', compact('risks', 'locations'));
     }
 }

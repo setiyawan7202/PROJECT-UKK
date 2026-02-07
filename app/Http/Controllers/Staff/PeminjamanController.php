@@ -45,11 +45,18 @@ class PeminjamanController extends Controller
         }
 
         $request->validate([
-            'barang_unit_ids' => 'required|array|size:' . $peminjaman->jumlah,
+            'barang_unit_ids' => 'required|array',
             'barang_unit_ids.*' => 'required|exists:barang_unit,id|distinct',
         ]);
 
         $unitIds = $request->barang_unit_ids;
+        $approvedCount = count($unitIds);
+
+        if ($approvedCount > $peminjaman->jumlah) {
+            return back()->with('error', 'Jumlah unit yang dipilih melebihi permintaan.');
+        }
+
+        $rejectedCount = $peminjaman->jumlah - $approvedCount;
 
         // Verify units availability
         $units = BarangUnit::whereIn('id', $unitIds)->get();
@@ -68,30 +75,59 @@ class PeminjamanController extends Controller
             }
         }
 
-        // 1. Assign First Unit to the original record
-        $firstUnitId = array_shift($unitIds);
+        // Logic Approval
+        if ($approvedCount > 0) {
+            // 1. Assign First Unit to the original record
+            $firstUnitId = array_shift($unitIds);
 
-        $peminjaman->update([
-            'status' => 'approved',
-            'barang_unit_id' => $firstUnitId,
-            'jumlah' => 1, // Reset quantity to 1 per record
-        ]);
-        $peminjaman->barang->decrement('jumlah_stok');
+            $peminjaman->update([
+                'status' => 'approved',
+                'barang_unit_id' => $firstUnitId,
+                'jumlah' => 1, // Reset quantity to 1 per record
+            ]);
+            $peminjaman->barang->decrement('jumlah_stok');
 
-        // 2. Create new records for remaining units
-        foreach ($unitIds as $unitId) {
-            $newPeminjaman = $peminjaman->replicate(['items']); // Copy attributes
-            $newPeminjaman->kode = Peminjaman::generateKode();
-            $newPeminjaman->barang_unit_id = $unitId;
-            $newPeminjaman->jumlah = 1;
-            $newPeminjaman->status = 'approved';
-            $newPeminjaman->created_at = $peminjaman->created_at; // Maintain original request time
-            $newPeminjaman->save();
+            // 2. Create new records for remaining units
+            foreach ($unitIds as $unitId) {
+                $newPeminjaman = $peminjaman->replicate(['items']); // Copy attributes
+                $newPeminjaman->kode = Peminjaman::generateKode();
+                $newPeminjaman->barang_unit_id = $unitId;
+                $newPeminjaman->jumlah = 1;
+                $newPeminjaman->status = 'approved';
+                $newPeminjaman->created_at = $peminjaman->created_at; // Maintain original request time
+                $newPeminjaman->save();
 
-            $newPeminjaman->barang->decrement('jumlah_stok');
+                // Send Email Notification
+                if ($peminjaman->user && $peminjaman->user->email) {
+                    try {
+                        $peminjaman->user->notify(new \App\Notifications\PeminjamanApprovedNotification($peminjaman));
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Failed to send approval email', ['error' => $e->getMessage()]);
+                    }
+                }
+
+                $newPeminjaman->barang->decrement('jumlah_stok');
+            }
+
+            // 3. Handle REJECTED (Unselected) units
+            if ($rejectedCount > 0) {
+                $rejectedPeminjaman = $peminjaman->replicate(['items']);
+                $rejectedPeminjaman->kode = Peminjaman::generateKode();
+                $rejectedPeminjaman->barang_unit_id = null;
+                $rejectedPeminjaman->jumlah = $rejectedCount;
+                $rejectedPeminjaman->status = 'rejected';
+                $rejectedPeminjaman->keterangan_penolakan = 'Sebagian permintaan ditolak karena unit tidak dipilih oleh staff.';
+                $rejectedPeminjaman->created_at = $peminjaman->created_at;
+                $rejectedPeminjaman->save();
+            }
+
+            \App\Helpers\ActivityLogger::log('Approve Peminjaman', 'Menyetujui peminjaman (Staff): ' . $peminjaman->kode . ' (' . count($request->barang_unit_ids) . ' unit)', $peminjaman);
+
+        } else {
+            return back()->with('error', 'Pilih setidaknya satu unit untuk disetujui.');
         }
 
-        return redirect()->route('staff.peminjaman.index')->with('success', 'Peminjaman disetujui. ' . count($request->barang_unit_ids) . ' unit telah dialokasikan.');
+        return redirect()->route('staff.peminjaman.show', $peminjaman->id)->with('success', 'Peminjaman disetujui. ' . $approvedCount . ' unit telah dialokasikan.');
     }
 
     /**
@@ -205,7 +241,7 @@ class PeminjamanController extends Controller
         // Validate Return Date (No Weekends)
         $tglKembali = \Carbon\Carbon::parse($request->tgl_kembali);
         if ($tglKembali->isWeekend()) {
-            return back()->withInput()->with('error', 'Tanggal pengembalian tidak boleh jatuh pada hari Sabtu atau Minggu.');
+            return back()->withInput()->with('error', 'Hari Sabtu/Minggu tidak dapat dipilih. Tidak bisa meminjam/mengembalikan barang di hari libur.');
         }
 
         $peminjaman = Peminjaman::with('barang', 'barangUnit')->findOrFail($id);
@@ -272,5 +308,108 @@ class PeminjamanController extends Controller
         }
 
         return redirect()->route('staff.peminjaman.bukti', $peminjaman->id);
+    }
+
+    /**
+     * Show inspection form
+     */
+    public function inspectForm($id)
+    {
+        $peminjaman = Peminjaman::with(['barang.kategori', 'barangUnit'])->findOrFail($id);
+
+        // Get checklist template for this category
+        $template = \App\Models\ChecklistTemplate::where('kategori_id', $peminjaman->barang->kategori_id)->first();
+
+        // Get existing inspections
+        $preInspection = \App\Models\Inspection::where('peminjaman_id', $id)
+            ->where('type', 'pre_borrow')
+            ->first();
+        $postInspection = \App\Models\Inspection::where('peminjaman_id', $id)
+            ->where('type', 'post_return')
+            ->first();
+
+        // Determine which type of inspection is needed
+        $inspectionType = null;
+        if ($peminjaman->status === 'approved' && !$preInspection) {
+            $inspectionType = 'pre_borrow';
+        } elseif ($peminjaman->status === 'active' && $preInspection && !$postInspection) {
+            $inspectionType = 'post_return';
+        }
+
+        return view('staff.peminjaman.inspect', compact(
+            'peminjaman',
+            'template',
+            'preInspection',
+            'postInspection',
+            'inspectionType'
+        ));
+    }
+
+    /**
+     * Store inspection data
+     */
+    public function storeInspection(Request $request, $id)
+    {
+        $peminjaman = Peminjaman::with('barangUnit')->findOrFail($id);
+
+        $validated = $request->validate([
+            'type' => 'required|in:pre_borrow,post_return',
+            'checklist_data' => 'nullable|array',
+            'photo' => 'nullable|image|max:2048',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $photoPath = null;
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('inspections', 'public');
+        }
+
+        // Create inspection for the unit in the loan
+        if ($peminjaman->barangUnit) {
+            $unit = $peminjaman->barangUnit;
+            $inspection = \App\Models\Inspection::create([
+                'peminjaman_id' => $id,
+                'barang_unit_id' => $unit->id,
+                'type' => $validated['type'],
+                'checklist_data' => $validated['checklist_data'] ?? [],
+                'photo_path' => $photoPath,
+                'notes' => $validated['notes'],
+                'inspector_id' => auth()->id(),
+                'inspected_at' => now(),
+            ]);
+
+            // If post-return, compare with pre-borrow
+            if ($validated['type'] === 'post_return') {
+                $preInspection = \App\Models\Inspection::where('peminjaman_id', $id)
+                    ->where('barang_unit_id', $unit->id)
+                    ->where('type', 'pre_borrow')
+                    ->first();
+
+                if ($preInspection) {
+                    $differences = \App\Models\Inspection::compareInspections($preInspection, $inspection);
+
+                    if (!empty($differences)) {
+                        $inspection->update([
+                            'has_damage' => true,
+                            'damage_details' => json_encode($differences),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        \App\Helpers\ActivityLogger::log(
+            'Inspeksi',
+            $validated['type'] === 'pre_borrow'
+            ? 'Melakukan inspeksi pra-peminjaman: ' . $peminjaman->kode
+            : 'Melakukan inspeksi pasca-pengembalian: ' . $peminjaman->kode,
+            $peminjaman
+        );
+
+        $message = $validated['type'] === 'pre_borrow'
+            ? 'Inspeksi pra-peminjaman berhasil dicatat.'
+            : 'Inspeksi pasca-pengembalian berhasil dicatat.';
+
+        return redirect()->route('staff.peminjaman.show', $id)->with('success', $message);
     }
 }

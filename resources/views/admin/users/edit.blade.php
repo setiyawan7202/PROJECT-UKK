@@ -34,13 +34,40 @@
             @csrf
             @method('PUT')
 
+            <!-- Status Aktivasi -->
+            <div class="mb-5 p-4 rounded-xl border {{ $user->is_active ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200' }}">
+                <div class="flex items-center gap-3">
+                    @if($user->is_active)
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div>
+                            <p class="text-sm font-medium text-green-800">Akun Aktif</p>
+                            <p class="text-xs text-green-600">User dapat login dengan email di bawah</p>
+                        </div>
+                    @else
+                        <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                        <div>
+                            <p class="text-sm font-medium text-yellow-800">Akun Belum Aktif</p>
+                            <p class="text-xs text-yellow-600">Isi email untuk mengaktifkan akun, atau biarkan user aktivasi sendiri</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             <!-- Email -->
             <div class="mb-5">
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email <span
-                        class="text-red-500">*</span></label>
-                <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email 
+                    <span class="text-gray-400 font-normal">(Kosongkan untuk menonaktifkan akun)</span>
+                </label>
+                @php
+                    $displayEmail = $user->email;
+                    if ($displayEmail && str_ends_with($displayEmail, '@temp.local')) {
+                        $displayEmail = '';
+                    }
+                @endphp
+                <input type="email" id="email" name="email" value="{{ old('email', $displayEmail) }}"
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
-                    placeholder="Masukkan email">
+                    placeholder="Masukkan email untuk mengaktifkan akun">
+                <p class="text-xs text-gray-500 mt-1">Jika email dikosongkan, akun akan dinonaktifkan dan user harus aktivasi ulang.</p>
             </div>
 
             <!-- Password -->
@@ -54,12 +81,14 @@
             </div>
 
             <!-- Nama Lengkap -->
-            <!-- Nama Lengkap (Displayed from relationship, read-only here or updated via relationship? For now, we update users.nama_lengkap... wait, we dropped it!) -->
             <div class="mb-5">
                 <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap <span
                         class="text-red-500">*</span></label>
+                @php
+                    $namaLengkap = $user->siswa?->username ?? $user->guru?->username ?? $user->username;
+                @endphp
                 <input type="text" id="nama_lengkap" name="nama_lengkap" required
-                    value="{{ old('nama_lengkap', ($user->siswa ? $user->siswa->username : ($user->guru ? $user->guru->username : ''))) }}"
+                    value="{{ old('nama_lengkap', $namaLengkap) }}"
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
                     placeholder="Nama lengkap">
             </div>
@@ -76,6 +105,7 @@
                         <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Admin</option>
                     @endif
                     <option value="petugas" {{ old('role', $user->role) === 'petugas' ? 'selected' : '' }}>Petugas</option>
+                    <option value="kepala_lab" {{ old('role', $user->role) === 'kepala_lab' ? 'selected' : '' }}>Kepala Lab</option>
                     <option value="pengguna" {{ old('role', $user->role) === 'pengguna' ? 'selected' : '' }}>Pengguna</option>
                 </select>
                 @if(Auth::user()->role !== 'superadmin' && in_array($user->role, ['superadmin', 'admin']))
@@ -139,7 +169,7 @@
                 <select id="kelas_id" name="kelas_id" class="searchable-select w-full">
                     <option value="">Pilih Kelas</option>
                     @foreach($kelasList as $kelas)
-                        <option value="{{ $kelas->id }}" {{ old('kelas_id', $user->kelas_id) == $kelas->id ? 'selected' : '' }}>
+                        <option value="{{ $kelas->id }}" {{ old('kelas_id', $user->siswa?->kelas_id) == $kelas->id ? 'selected' : '' }}>
                             {{ $kelas->nama_kelas }} ({{ $kelas->jurusan }})
                         </option>
                     @endforeach

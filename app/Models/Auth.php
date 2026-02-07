@@ -20,6 +20,7 @@ class Auth extends Authenticatable
         'password',
         'role',
         'status',
+        'is_active',
         'permissions',
     ];
 

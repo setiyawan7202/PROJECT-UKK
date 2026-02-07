@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Auth;
 use App\Models\Ruangan;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,11 +14,12 @@ class RuanganController extends Controller
     {
         $search = $request->get('search');
 
-        $ruangans = Ruangan::when($search, function ($query, $search) {
-            $query->where('nama_ruangan', 'like', "%{$search}%")
-                ->orWhere('kode_ruangan', 'like', "%{$search}%")
-                ->orWhere('lokasi', 'like', "%{$search}%");
-        })
+        $ruangans = Ruangan::with(['kepala1', 'kepala2'])
+            ->when($search, function ($query, $search) {
+                $query->where('nama_ruangan', 'like', "%{$search}%")
+                    ->orWhere('kode_ruangan', 'like', "%{$search}%")
+                    ->orWhere('lokasi', 'like', "%{$search}%");
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -27,7 +29,8 @@ class RuanganController extends Controller
     public function create()
     {
         $generatedKode = Ruangan::generateKode();
-        return view('admin.ruangan.create', compact('generatedKode'));
+        $kepalaUsers = Auth::where('role', 'kepala_lab')->orderBy('username')->get();
+        return view('admin.ruangan.create', compact('generatedKode', 'kepalaUsers'));
     }
 
     /**
@@ -47,9 +50,11 @@ class RuanganController extends Controller
             'nama_ruangan' => 'required|string|max:255',
             'lokasi' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
+            'kepala1_id' => 'nullable|exists:users,id',
+            'kepala2_id' => 'nullable|exists:users,id|different:kepala1_id',
         ]);
 
-        Ruangan::create($request->all());
+        Ruangan::create($request->only(['kode_ruangan', 'nama_ruangan', 'lokasi', 'keterangan', 'kepala1_id', 'kepala2_id']));
 
         return redirect()->route('admin.ruangan.index')
             ->with('success', 'Ruangan berhasil ditambahkan!');
@@ -58,8 +63,9 @@ class RuanganController extends Controller
     public function edit($id)
     {
         $ruangan = Ruangan::findOrFail($id);
+        $kepalaUsers = Auth::where('role', 'kepala_lab')->orderBy('username')->get();
 
-        return view('admin.ruangan.edit', compact('ruangan'));
+        return view('admin.ruangan.edit', compact('ruangan', 'kepalaUsers'));
     }
 
     public function update(Request $request, $id)
@@ -71,9 +77,11 @@ class RuanganController extends Controller
             'nama_ruangan' => 'required|string|max:255',
             'lokasi' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
+            'kepala1_id' => 'nullable|exists:users,id',
+            'kepala2_id' => 'nullable|exists:users,id|different:kepala1_id',
         ]);
 
-        $ruangan->update($request->all());
+        $ruangan->update($request->only(['kode_ruangan', 'nama_ruangan', 'lokasi', 'keterangan', 'kepala1_id', 'kepala2_id']));
 
         return redirect()->route('admin.ruangan.index')
             ->with('success', 'Ruangan berhasil diperbarui!');

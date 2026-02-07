@@ -13,12 +13,26 @@ class PeminjamanController extends Controller
 {
     public function index()
     {
+        // Hanya tampilkan status aktif (pending, approved, active)
         $peminjaman = Peminjaman::where('user_id', Auth::id())
+            ->whereIn('status', ['pending', 'approved', 'active'])
             ->with(['barang', 'barangUnit'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return view('peminjaman.index', compact('peminjaman'));
+    }
+
+    public function history()
+    {
+        // Hanya tampilkan status history (completed, rejected, canceled)
+        $peminjaman = Peminjaman::where('user_id', Auth::id())
+            ->whereIn('status', ['completed', 'rejected', 'canceled'])
+            ->with(['barang', 'barangUnit', 'pengembalian'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('peminjaman.history', compact('peminjaman'));
     }
 
     public function show($id)
@@ -148,11 +162,11 @@ class PeminjamanController extends Controller
         $tglKembali = \Carbon\Carbon::createFromFormat('Y-m-d', $request->tgl_kembali_rencana);
 
         if ($tglPinjam->isWeekend()) {
-            return back()->withInput()->with('error', 'Tanggal pinjam tidak boleh jatuh pada hari Sabtu atau Minggu.');
+            return back()->withInput()->with('error', 'Hari Sabtu/Minggu tidak dapat dipilih. Tidak bisa meminjam/mengembalikan barang di hari libur.');
         }
 
         if ($tglKembali->isWeekend()) {
-            return back()->withInput()->with('error', 'Tanggal kembali tidak boleh jatuh pada hari Sabtu atau Minggu.');
+            return back()->withInput()->with('error', 'Hari Sabtu/Minggu tidak dapat dipilih. Tidak bisa meminjam/mengembalikan barang di hari libur.');
         }
 
         // Validate: max 7 days return period
@@ -226,7 +240,7 @@ class PeminjamanController extends Controller
             return back()->with('error', 'Hanya pengajuan yang masih menunggu persetujuan yang dapat dibatalkan.');
         }
 
-        $peminjaman->delete();
+        $peminjaman->update(['status' => 'canceled']);
 
         \App\Helpers\ActivityLogger::log('Batal Peminjaman', 'Membatalkan pengajuan peminjaman: ' . $peminjaman->kode, $peminjaman);
 
